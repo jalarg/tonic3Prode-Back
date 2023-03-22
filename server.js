@@ -4,6 +4,7 @@ const app  = express();
 const { port, corsOrigin } = require('./config');
 const cors = require("cors");
 const morgan = require("morgan");
+const { mongoDBHelpers } = require('./helpers');
 
 // ROUTES   
 const routes = require('./routes');
@@ -34,3 +35,10 @@ app.use(function (err, req, res, next) {
 app.listen(port, () => {
     console.log('Server listen on port', port);
   });
+  
+
+// CONNECT TO MONGODB
+(async () => {
+  await mongoDBHelpers.connect();
+})();
+  
