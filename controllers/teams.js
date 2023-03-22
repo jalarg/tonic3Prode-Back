@@ -15,4 +15,13 @@ module.exports = {
     const savedTeam = await newTeam.save();
     res.send(savedTeam);
   },
+  deleteTeams: async (req, res) => {
+    await Teams.deleteMany();
+    res.send("The teams were deleted");
+  },
+  deleteOneTeam: async (req, res) => {
+    const team = await Teams.findOneAndDelete({nombre: req.body.nombre });
+    res.send("The team selected was deleted");
+  },
+
 };
