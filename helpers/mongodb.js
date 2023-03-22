@@ -21,8 +21,6 @@ const connect = async () => {
   }
 };
 
-console.log("Hola")
-connect ()
 
 const disconnect = async () => {
   await mongoose.connection.close();
