@@ -9,9 +9,9 @@ router.get("/", getAll);
 router.post("/", createOneUser);
 
 // BORRAR TODOS LOS USUARIOS
-router.put("/deleteusers", deleteUsers);
+router.delete("/deleteusers", deleteUsers);
 
 // BORRAR TODOS LOS USUARIOS
-router.put("/deleteuser", deleteOneUser);
+router.delete("/deleteuser", deleteOneUser);
 
 module.exports = router;

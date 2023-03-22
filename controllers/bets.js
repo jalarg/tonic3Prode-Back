@@ -23,6 +23,18 @@ module.exports = {
     const savedBet = await newBet.save();
     res.send(savedBet);
   },
+
+  deleteAllBets: async (req, res) => {
+    await Bets.deleteMany();
+    res.send("All bets were deleted");
+  },
+
+  deleteOneBet: async (req, res) => {
+    await Bets.findOneAndDelete({gameId: req.body.gameId });
+    res.send("The bet was deleted");
+  }, 
+
+
 };
 
 
