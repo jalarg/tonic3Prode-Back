@@ -12,9 +12,9 @@ router.post("/addteams", updateTeams);
 router.post("/addteam", updateOneTeam);
 
 // BORRAR TODOS LOS EQUIPOS
-router.put("/deleteteams", deleteTeams);
+router.delete("/deleteteams", deleteTeams);
 
 // BORRAR UN EQUIPO
-router.put("/deleteteam", deleteOneTeam);
+router.delete("/deleteteam", deleteOneTeam);
 
 module.exports = router;

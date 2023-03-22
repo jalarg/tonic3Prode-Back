@@ -30,4 +30,15 @@ module.exports = {
       }
     }
   },
+
+  deletePrizes: async (req, res) => {
+    await Prizes.deleteMany();
+    res.send("All prizes were deleted");
+  },
+
+  deleteOnePrize: async (req, res) => {
+    const prize = await Prizes.findOneAndDelete({tournament: req.body.tournament });
+    res.send("The prize was deleted");
+  }, 
+
 };
