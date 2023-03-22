@@ -1,4 +1,5 @@
 require("dotenv").config();
+const bodyParser = require("body-parser");
 const express = require('express');
 const app  = express(); 
 const { port, corsOrigin } = require('./config');
@@ -9,7 +10,10 @@ const { mongoDBHelpers } = require('./helpers');
 // ROUTES   
 const routes = require('./routes');
 
+
 // MIDDLEWARES
+app.use(bodyParser.json());
+
 app.use(
     cors({
       origin: corsOrigin,
@@ -17,6 +21,7 @@ app.use(
     })
 )
 
+app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(express.json());
 
