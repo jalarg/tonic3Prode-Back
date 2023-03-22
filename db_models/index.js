@@ -1,6 +1,8 @@
 const Teams = require('./Teams');
 const Users = require('./Users');
+const Tournaments = require("./Tournaments")
 const Prizes = require('./Prizes');
 const Bets = require('./Bets');
 
-module.exports = { Teams, Users, Prizes, Bets };  
+module.exports = { Teams, Users, Prizes, Bets, Tournaments };  
+
