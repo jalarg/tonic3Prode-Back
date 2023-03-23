@@ -4,7 +4,7 @@ module.exports = {
   getAll: async (req, res) => {
     let games;
     try {
-      games = await Games.find({});
+      games = await Games.find({}).populate("tournaments");
       res.send(games);
     } catch (error) {
       res.status(500).send(error);
@@ -14,7 +14,10 @@ module.exports = {
   getAGameById: async (req, res) => {
     let game;
     try {
-      game = await Games.findById(req.params.id);
+      game = await Games.findById(req.params.id).populate(
+        "tournaments",
+        "title"
+      );
       res.send(game);
     } catch (error) {
       res.status(500).send(error);
@@ -22,12 +25,16 @@ module.exports = {
   },
 
   adminCreateAGame: async (req, res) => {
-    let game;
-    try {
-      game = await Games.create(req.body);
-    } catch (error) {
-      res.status(500).send(error);
-    }
+    const { stage, status, details, result, tournaments } = req.body;
+    const newGame = new Games({
+      tournaments,
+      stage,
+      status,
+      details,
+      result,
+    });
+    await newGame.save();
+    res.send(newGame);
   },
 
   adminEditAGame: async (req, res) => {
