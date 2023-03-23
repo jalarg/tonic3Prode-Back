@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const gameSchema = Schema({
-  tournament: { type: Schema.Types.ObjectId, ref: "tournaments" },
+  tournaments: { type: Schema.Types.ObjectId, ref: "tournaments" },
   stage: { type: String, required: true },
   status: { type: String, required: true },
   day: { type: Date, required: true },
