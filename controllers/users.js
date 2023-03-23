@@ -1,21 +1,38 @@
 const { Users } = require("../db_models");
 
 module.exports = {
+
   getAll: async (req, res) => {
+    try {
     const bets = await Users.find();
-    res.send(bets);
+    res.send(bets)
+    } catch (err) {
+    next(err)
+    }
   },
   createOneUser: async (req, res) => {
+    try {
     const newUser = new Users(req.body);
     const savedUser = await newUser.save();
-    res.send(savedUser);
-  },  
+    res.send(savedUser)
+    } catch (err) {
+    next(err)
+    }
+  },
   deleteUsers: async (req, res) => {
-    await Users.deleteMany();
-    res.send("All the users were deleted");
+    try{
+      await Users.deleteMany();
+      res.send("All the users were deleted");
+    } catch (err) {
+      next(err)
+    }
   },
   deleteOneUser: async (req, res) => {
-    const user = await Users.findOneAndDelete({nombre: req.body.nombre });
+    try{
+    const user = await Users.findOneAndDelete({uid: req.body.uid });
     res.send("The user was deleted");
-  }, 
+    } catch (err) {
+    next(err)
+  }
+}
 }
