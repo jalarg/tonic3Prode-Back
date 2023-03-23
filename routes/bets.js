@@ -8,14 +8,13 @@ router.get("/", getAll);
 // OBTENER TODAS LAS APUESTAS DE UN USUARIO
 router.get("/search/:id", findUserBets);
 
-// OBTENER TODAS LAS APUESTAS DE UN USUARIO
+// AGREGAR UNA APUESTA
 router.post("/", addOneBet);
 
-
-// BORRAR TODOS LOS USUARIOS
+// BORRAR TODAS LAS APUESTAS
 router.delete("/deletebets", deleteAllBets);
 
-// BORRAR TODOS LOS USUARIOS
+// BORRAR UNA APUESTA
 router.delete("/deletebet", deleteOneBet);
 
 module.exports = router;

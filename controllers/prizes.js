@@ -1,27 +1,39 @@
-const mongoose = require("mongoose"); 
+const mongoose = require("mongoose");
 const { Prizes } = require("../db_models");
-const prizes = require("../seed/prizes");
 
 module.exports = {
-  getAll: async (req, res) => {
-    const prizes = await Prizes.find();
-    res.send(prizes);
+  getAll: async (req, res, next) => {
+    try {
+      const prizes = await Prizes.find();
+      res.send(prizes);
+    } catch (err) {
+      next(err);
+    }
   },
-  addOnePrize: async (req, res) => {
-    const newPrize = new Prizes(req.body);
-    const savedPrize = await newPrize.save();
-    res.send(savedPrize);
+  addOnePrize: async (req, res, next) => {
+    console.log(req.body)
+    try {
+      const newPrize = new Prizes(req.body);
+      const savedPrize = await newPrize.save();
+      res.send(savedPrize);
+    } catch (err) {
+      next(err);
+    }
   },
-  changeOnePrize: async (req, res) => {
+  changeOnePrize: async (req, res, next) => {
     const prizeId = req.params.id;
     const prizeDataToUpdate = req.body;
     try {
-      const updatedPrize = await Prizes.findOneAndUpdate({ _id: prizeId }, prizeDataToUpdate, { new: true });
+      const updatedPrize = await Prizes.findOneAndUpdate(
+        { _id: prizeId },
+        prizeDataToUpdate,
+        { new: true }
+      );
       if (!updatedPrize) {
         res.status(404).send("Prize not found");
       } else {
         res.send(updatedPrize);
-      }      
+      }
     } catch (error) {
       if (error instanceof mongoose.CastError) {
         res.status(400).send("Invalid prize ID");
@@ -37,8 +49,9 @@ module.exports = {
   },
 
   deleteOnePrize: async (req, res) => {
-    const prize = await Prizes.findOneAndDelete({tournament: req.body.tournament });
+    const prize = await Prizes.findOneAndDelete({
+      tournament: req.body.tournament,
+    });
     res.send("The prize was deleted");
-  }, 
-
+  },
 };
