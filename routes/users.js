@@ -11,7 +11,7 @@ router.post("/", createOneUser);
 // BORRAR TODOS LOS USUARIOS
 router.delete("/deleteusers", deleteUsers);
 
-// BORRAR TODOS LOS USUARIOS
+// BORRAR A UN USUARIO
 router.delete("/deleteuser", deleteOneUser);
 
 module.exports = router;
