@@ -33,3 +33,20 @@ const user = [
 ]
 
 
+const admin = [
+  {
+    admin: {
+      username: "pepeppe",
+      email: "superuse123132r@gmail.com",
+      uid: "5",
+      name: "Supereee",
+      lastName: "Usereee",
+      rol: "admin",
+      address: "Calle 123",
+      country: "Argentina",
+      cellphone: "123456789",
+    },
+
+    loggedUser: { uid: "0" },
+  },
+];

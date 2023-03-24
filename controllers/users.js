@@ -35,6 +35,24 @@ module.exports = {
 
   // RUTAS DE PERMISO ESPECIAL!!
   // SOLO SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
+  createOneAdmin: async (req, res, next) => { 
+  const {loggedUser, admin } = req.body;
+  const user = await Users.findOne({ uid: loggedUser.uid });
+   if(!user) {
+      res.status(404).send("User not found");
+   }
+   if (user.rol !== "superAdmin") {
+     res.status(403).send("You are not allowed to do this action");
+   }
+    try {
+      const newAdmin = new Users(admin);
+      const savedAdmin = await newAdmin.save();
+      res.send(savedAdmin);
+    }
+    catch (err) { 
+      next(err);
+    }
+  },  
   deleteUsers: async (req, res, next) => {
     const loggedUser = req.body;
     if (loggedUser.rol !== "superadmin") {
