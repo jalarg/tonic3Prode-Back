@@ -5,7 +5,7 @@ const user = [
       "uid": "0",
       "name": "Super",
       "lastName": "User",
-      "superAdmin": true,
+      "rol": "superAdmin",
       "address": "Calle 123",
       "country": "Argentina",
       "cellphone": "123456789"
@@ -23,7 +23,7 @@ const user = [
     {
       "username": "ross",
       "email": "ross2024@gmail.com",
-      "uid": "1",
+      "uid": "2",
       "name": "Rocio",
       "lastName": "Diez",
       "address": "Larrea 123",
