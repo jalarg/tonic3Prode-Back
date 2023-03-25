@@ -42,13 +42,11 @@ module.exports = {
 
   bulkCreateAGames: async (req, res, next) => {
     try {
-      const { stage, status, details, result, tournaments } = req.body;
+      const { stage, status, details, result, tournaments } = req.body; // AGREGAR gamesData que va a venir del front
 
       if (!Array.isArray(gamesData) || gamesData.length === 0) {
-            return res
-              .status(400)
-              .send({ error: "Invalid or missing games data" });
-          }
+        return res.status(400).send({ error: "Invalid or missing games data" });
+      }
 
       const games = [];
 
@@ -59,9 +57,11 @@ module.exports = {
         const dayOfTheMonth = gamesData[i][2].dayOfTheMonth;
         const month = gamesData[i][2].month;
         const hour = gamesData[i][2].hour;
+        const gameIndex = i;
 
         const newGame = new Games({
           tournaments,
+          gameIndex: gameIndex,
           stage,
           status,
           details,
@@ -74,14 +74,38 @@ module.exports = {
         });
 
         games.push(newGame);
-        await newGame.save();  
+        await newGame.save();
       }
-    res.send("Los encuentros se han creado correctamente");
+      res.send("Los encuentros se han creado correctamente");
     } catch (err) {
       next(err);
     }
   },
 
+  // GENERATE FUTURE GAMES ---- EN PROCESO
+
+  generateFutureGames: async (req, res, next) => {
+    // No encuentro los games de un torneo especifico
+    const tournamentId = req.params.id;
+    const games = await Games.find({
+      tournaments: tournamentId,
+      status: "pending",
+    }); // devuelve array vacio
+    // mapear juegos y buscar ganadores
+    games.map((game) => {
+      // pensar logica
+    });
+
+    //aguardar ganadores para crear llave siguiente
+
+    // crear juegos de la siguiente llave
+
+    // guardar juegos en la base de datos
+  },
+
+  //---- EN PROCESO
+
+  // TENGO DUDAS SI USAR ESTA FUNCION PARA AGREGAR EL RESULTADO O CREAR UNA NUEVA
   adminEditAGame: async (req, res) => {
     let game;
     try {
@@ -91,6 +115,9 @@ module.exports = {
       res.status(500).send(error);
     }
   },
+
+  //---- EN PROCESO
+  
   adminDeleteAGame: async (req, res) => {
     let game;
     try {

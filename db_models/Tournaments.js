@@ -7,9 +7,10 @@ const schema = Schema({
   beggining: { type: Date, required: true },
   ending: { type: Date, required: true },
   title: { type: String, unique: true, required: true },
-  details: { type: String,required: true },
+  details: { type: String, required: true },
   teams: [{ type: Schema.Types.ObjectId, ref: "teams" }],
   type: { type: String, default: "Table" },
+  games: [{ type: Schema.Types.ObjectId, ref: "games" }],
 });
 
 //FUNCION PARA AGREGAR FECHA.
