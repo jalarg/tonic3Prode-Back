@@ -5,6 +5,7 @@ const {
   getAGameById,
   adminCreateAGame,
   bulkCreateAGames,
+  generateFutureGames,
   adminEditAGame,
   adminDeleteAGame,
   deleteGames,
@@ -18,6 +19,9 @@ router.get("/:id", getAGameById);
 
 //admin create a stage of games [NUEVA RUTA]
 router.post("/", bulkCreateAGames);
+
+// Create future games NUEVA RUTA]
+router.get("/newstage/:id",  generateFutureGames)
 
 //admin create a game
 router.post("/admin/create", adminCreateAGame); //esta no iría

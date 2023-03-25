@@ -3,6 +3,7 @@
 
   const gameSchema = Schema({
     tournaments: { type: Schema.Types.ObjectId, ref: "tournaments" },
+    gameIndex: { type: Number, required: true },
     stage: { type: String, required: true },
     status: { type: String, required: true },
     hour: { type: Number },
