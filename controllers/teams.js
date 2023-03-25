@@ -1,5 +1,5 @@
 const { Teams } = require("../db_models");
-const teams = require("../seed/teams");
+const { teams } = require("../seed/teams");
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -37,7 +37,8 @@ module.exports = {
   },
   deleteOneTeam: async (req, res, next) => {
     try {
-      const team = await Teams.findOneAndDelete({ nombre: req.body.nombre });
+      const team = await Teams.findOneAndDelete({ _id: req.params.id });
+      console.log(team)
       res.send("The team selected was deleted");
     } catch (err) {
       next(err);

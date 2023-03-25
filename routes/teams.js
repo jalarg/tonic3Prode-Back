@@ -6,16 +6,16 @@ const { getAll, updateTeams, updateOneTeam, deleteTeams, deleteOneTeam } = requi
 router.get("/", getAll);
 
 // CREAR TODOS LOS EQUIPOS [BULK CREATE - SEED INICIAL]
-router.post("/addteams", updateTeams);
+router.post("/", updateTeams);
 
 // AGREGAR UN EQUIPO
-router.post("/addteam", updateOneTeam);
+router.post("/:id", updateOneTeam);
 
 // BORRAR TODOS LOS EQUIPOS
-router.delete("/deleteteams", deleteTeams);
+router.delete("/", deleteTeams);
 
 // BORRAR UN EQUIPO
-router.delete("/deleteteam", deleteOneTeam);
+router.delete("/:id", deleteOneTeam);
 
 
 module.exports = router;

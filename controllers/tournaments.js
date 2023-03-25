@@ -1,4 +1,5 @@
 const { Tournaments } = require("../db_models");
+const tournamentCopaArgentina = require("../seed/tournamentCA");
 
 module.exports = {
   getAll: async (req, res, next) => {
