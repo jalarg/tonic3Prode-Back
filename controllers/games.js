@@ -1,5 +1,5 @@
-const { Games } = require("../db_models");
-const  gamesData = require("../seed/games");
+const { Games, Users } = require("../db_models");
+const gamesData = require("../seed/games");
 
 module.exports = {
   getAll: async (req, res) => {
@@ -41,9 +41,16 @@ module.exports = {
   // CREATE ALL GAMES OF ONE STAGE
 
   bulkCreateAGames: async (req, res, next) => {
+    const tournamentId = req.params.id;
+    const { stage, status, details, result, uid } = req.body; // AGREGAR gamesData que va a venir del front
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
     try {
-      const { stage, status, details, result, tournaments } = req.body; // AGREGAR gamesData que va a venir del front
-
       if (!Array.isArray(gamesData) || gamesData.length === 0) {
         return res.status(400).send({ error: "Invalid or missing games data" });
       }
@@ -60,7 +67,7 @@ module.exports = {
         const gameIndex = i;
 
         const newGame = new Games({
-          tournaments,
+          tournaments: tournamentId,
           gameIndex: gameIndex,
           stage,
           status,
@@ -95,7 +102,7 @@ module.exports = {
     games.map((game) => {
       // pensar logica
     });
-
+    res.send(games);
     //aguardar ganadores para crear llave siguiente
 
     // crear juegos de la siguiente llave
@@ -105,7 +112,53 @@ module.exports = {
 
   //---- EN PROCESO
 
-  // TENGO DUDAS SI USAR ESTA FUNCION PARA AGREGAR EL RESULTADO O CREAR UNA NUEVA
+  // RUTA PARA AGREGAR LOS RESULTADOS DE UN PARTIDO
+
+  addResult: async (req, res, next) => {
+    const gameId = req.params.id;
+    const { team1, team2, score1, score2, winner, uid } = req.body;
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+    try {
+      const result = {
+        team1,
+        team2,
+        score1,
+        score2,
+        winner,
+      };
+
+      const game = await Games.findOne({ _id: gameId });
+      // Validar que los equipos ingresados existan
+      if (
+        !game.teams[0].name.includes(team1) ||
+        !game.teams[1].name.includes(team2)
+      ) {
+        return res.status(400).send({ error: "Invalid or missing teams" });
+      }
+      //varificar que los resultados sean correctos
+      if (score1 < 0 || score2 < 0) {
+        return res.status(400).send({ error: "Invalid or missing scores" });
+      }
+      if (winner !== team1 && winner !== team2) {
+        return res.status(400).send({ error: "Invalid or missing winner" });
+      }
+      const updatedGame = await Games.findOneAndUpdate(
+        { _id: gameId },
+        { result: result },
+        { new: true }
+      );
+      res.send(updatedGame);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   adminEditAGame: async (req, res) => {
     let game;
     try {
@@ -117,7 +170,7 @@ module.exports = {
   },
 
   //---- EN PROCESO
-  
+
   adminDeleteAGame: async (req, res) => {
     let game;
     try {

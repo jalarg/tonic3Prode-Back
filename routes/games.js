@@ -8,6 +8,7 @@ const {
   generateFutureGames,
   adminEditAGame,
   adminDeleteAGame,
+  addResult,
   deleteGames,
 } = require("../controllers/games");
 
@@ -18,10 +19,12 @@ router.get("/", getAll);
 router.get("/:id", getAGameById);
 
 //admin create a stage of games [NUEVA RUTA]
-router.post("/", bulkCreateAGames);
+router.post("/:id", bulkCreateAGames);
 
 // Create future games NUEVA RUTA]
 router.get("/newstage/:id",  generateFutureGames)
+
+router.put("/result/:id", addResult);
 
 //admin create a game
 router.post("/admin/create", adminCreateAGame); //esta no iría

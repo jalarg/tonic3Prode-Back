@@ -1,20 +1,20 @@
 const gamesData = [
   [
     {
-      nombre: "River Plate",
+      name: "River Plate",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m107800_River_Plate.svg",
       division: "Liga Profesional",
-      fundacion: "25 de mayo de 1901",
-      origen: "Buenos Aires, Argentina",
+      foundation: "25 de mayo de 1901",
+      origin: "Buenos Aires, Argentina",
     },
     {
-      nombre: "Racing de Córdoba",
+      name: "Racing de Córdoba",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m100082_Racing_de_Cordoba.svg",
       division: "Torneo Federal A",
-      fundacion: "1924",
-      origen: "Córdoba, Argentina",
+      foundation: "1924",
+      origin: "Córdoba, Argentina",
     },
     {
       dayOfTheWeek: 1,
@@ -25,20 +25,20 @@ const gamesData = [
   ],
   [
     {
-      nombre: "Talleres",
+      name: "Talleres",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m107326_Talleres_C.svg",
       division: "Liga Profesional",
-      fundacion: "12 de octubre de 1913",
-      origen: "Córdoba, Argentina",
+      foundation: "12 de octubre de 1913",
+      origin: "Córdoba, Argentina",
     },
     {
-      nombre: "Chacarita Juniors",
+      name: "Chacarita Juniors",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m100712_Chacarita_juniors.svg",
       division: "Primera Nacional",
-      fundacion: "1 de mayo de 1906",
-      origen: "San Martín, Buenos Aires, Argentina",
+      foundation: "1 de mayo de 1906",
+      origin: "San Martín, Buenos Aires, Argentina",
     },
     {
       dayOfTheWeek: 2,
@@ -49,20 +49,20 @@ const gamesData = [
   ],
   [
     {
-      nombre: "Club Atlético Colón",
+      name: "Club Atlético Colón",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m100015_Colon-Santa-fe.svg",
       division: "Superliga Argentina",
-      fundacion: "5 de mayo de 1905",
-      origen: "Santa Fe, Argentina",
+      foundation: "5 de mayo de 1905",
+      origin: "Santa Fe, Argentina",
     },
     {
-      nombre: "Colegiales",
+      name: "Colegiales",
       logo_url:
         "https://copaargentina.s3.amazonaws.com/original/m107515_Colegiales.svg",
       division: "Primera B Metropolitana",
-      fundacion: "1 de mayo de 1909",
-      origen: "Munro, Buenos Aires, Argentina",
+      foundation: "1 de mayo de 1909",
+      origin: "Munro, Buenos Aires, Argentina",
     },
     {
       dayOfTheWeek: 3,
