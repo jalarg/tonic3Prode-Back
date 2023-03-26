@@ -18,6 +18,15 @@ module.exports = {
       next(err);
     }
   },
+  searchTeam: async (req, res, next) => {
+    try {
+      const { name } = req.params;
+      const team = await Teams.findOne({ name: { $eq: name } }).exec();
+      res.send(team);
+    } catch (err) {
+      next(err);
+    }
+  },
   updateOneTeam: async (req, res, next) => {
     try {
       const newTeam = new Teams(req.body);
@@ -38,7 +47,7 @@ module.exports = {
   deleteOneTeam: async (req, res, next) => {
     try {
       const team = await Teams.findOneAndDelete({ _id: req.params.id });
-      console.log(team)
+      console.log(team);
       res.send("The team selected was deleted");
     } catch (err) {
       next(err);
