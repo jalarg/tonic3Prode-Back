@@ -11,17 +11,26 @@ module.exports = {
       next(err);
     }
   },
-addStadiums: async (req, res, next) => {
-  try {
-    const stadiums = stadiumsArgentina.map((name) => ({ name }));
-    const data = await Stadiums.insertMany(stadiums); 
-    console.log(`${data.length} stadiums saved`);
-    res.send(data);
-  } catch (err) {
-    next(err);
-  }
-},
-addOneStadium: async (req, res, next) => {
+  searchStadium: async (req, res, next) => {
+    try {
+      const { name } = req.params;
+      const team = await Stadiums.findOne({ name: { $eq: name } }).exec();
+      res.send(team);
+    } catch (err) {
+      next(err);
+    }
+  },
+  addStadiums: async (req, res, next) => {
+    try {
+      const stadiums = stadiumsArgentina.map((name) => ({ name }));
+      const data = await Stadiums.insertMany(stadiums);
+      console.log(`${data.length} stadiums saved`);
+      res.send(data);
+    } catch (err) {
+      next(err);
+    }
+  },
+  addOneStadium: async (req, res, next) => {
     try {
       const newStadium = new Stadiums(req.body);
       const savedStadium = await newStadium.save();
@@ -30,7 +39,7 @@ addOneStadium: async (req, res, next) => {
       next(err);
     }
   },
-deleteOneStadium: async (req, res, next) => {
+  deleteOneStadium: async (req, res, next) => {
     try {
       await Stadiums.findOneAndDelete({ name: req.body.name });
       res.send("The Stadium selected was deleted");

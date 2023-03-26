@@ -7,7 +7,10 @@ const {
   deleteOne,
   deleteAll,
   getOne,
+  getAllTournamentTeams,
+  getOneTournamentTeam,
   updateOne,
+  searchTournament
 } = require("../controllers/tournaments");
 
 // OBTENER TODOS LOS TORNEOS
@@ -17,10 +20,13 @@ router.get("/", getAll);
 router.get("/:_id", getOne);
 
 //OBTENER LOS EQUIPOS DEL TORNEO
-router.get("/teams");
+router.get("/:_id/teams", getAllTournamentTeams);
 
 //OBTENER UN EQUIPO DEL TORNEO
-router.get("/:_id/team")
+router.get("/:_id/:name/team", getOneTournamentTeam);
+
+//BUSCAR UN TORNEO
+router.get("/search/:title", searchTournament);
 
 // AGREGAR UN TORNEO [SEED INICIAL]
 router.post("/", createTournament);
