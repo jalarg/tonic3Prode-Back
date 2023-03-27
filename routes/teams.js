@@ -1,6 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { getAll, updateTeams, searchTeam, updateOneTeam, deleteTeams, deleteOneTeam } = require("../controllers/teams");
+
+const {
+  getAll,
+  updateTeams,
+  searchTeam,
+  createOneTeam,
+  updateOneTeam,
+  deleteTeams,
+  deleteOneTeam,
+} = require("../controllers/teams");
+
 
 // OBTENER TODOS LOS EQUIPOS
 router.get("/", getAll);
@@ -12,7 +22,9 @@ router.get("/search/:name", searchTeam)
 router.post("/", updateTeams);
 
 // AGREGAR UN EQUIPO
-router.post("/:id", updateOneTeam);
+router.post("/add", createOneTeam);
+
+router.put("/:id", updateOneTeam);
 
 // BORRAR TODOS LOS EQUIPOS
 router.delete("/", deleteTeams);

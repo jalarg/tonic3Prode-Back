@@ -11,15 +11,14 @@ module.exports = {
   },
   findOneUser: async (req, res, next) => {
     try {
-       const username = req.params.username;
-       console.log(username)
-       const user = await Users.findOne({ username });
-        if (!user) {
-           return res.status(404).send("User not found");
-        }
-       res.send(user);
-    }
-    catch (err) {
+      const username = req.params.username;
+      console.log(username);
+      const user = await Users.findOne({ username });
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+      res.send(user);
+    } catch (err) {
       next(err);
     }
   },
@@ -35,28 +34,33 @@ module.exports = {
 
   // RUTAS DE PERMISO ESPECIAL!!
   // SOLO SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
-  createOneAdmin: async (req, res, next) => { 
-  const {loggedUser, admin } = req.body;
-  const user = await Users.findOne({ uid: loggedUser.uid });
-   if(!user) {
-      res.status(404).send("User not found");
-   }
-   if (user.rol !== "superAdmin") {
-     res.status(403).send("You are not allowed to do this action");
-   }
+
+  createOneAdmin: async (req, res, next) => {
+    console.log(req.body)
+    const { uid, admin } = req.body;
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
     try {
       const newAdmin = new Users(admin);
       const savedAdmin = await newAdmin.save();
       res.send(savedAdmin);
-    }
-    catch (err) { 
+    } catch (err) {
       next(err);
     }
-  },  
+  },
   deleteUsers: async (req, res, next) => {
-    const loggedUser = req.body;
-    if (loggedUser.rol !== "superadmin") {
-      res.status(403).send("You are not allowed to do this action");
+    const { uid } = req.body;
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin") {
+      return res.status(403).send("You are not allowed to do this action");
     }
     try {
       await Users.deleteMany();
@@ -68,11 +72,14 @@ module.exports = {
 
   // SUPERADMIN Y ADMIN PUEDE BORRAR UN USUARIO
   deleteOneUser: async (req, res, next) => {
+    const uidUserToDelete = req.params.id;
     const { uid } = req.body;
-    const loggedUser = await Users.findOne({ uid });
-    const uidUserToDelete = req.params.uid
-    if (loggedUser.rol !== "superAdmin") {
-      res.status(403).send("You are not allowed to do this action");
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin") {
+      return res.status(403).send("You are not allowed to do this action");
     }
     try {
       const user = await Users.findOneAndDelete({ uid: uidUserToDelete });

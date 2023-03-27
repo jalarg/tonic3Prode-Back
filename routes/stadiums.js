@@ -5,6 +5,8 @@ const {
   searchStadium,
   addStadiums,
   addOneStadium,
+  updateOneStadium,
+  deleteStadiums,
   deleteOneStadium,
 } = require("../controllers/stadiums");
 
@@ -15,12 +17,18 @@ router.get("/", getAll);
 router.get("/search/:name", searchStadium);
 
 // SUBIR JSON DE ESTADIOS [BULK CREATE - SEED INICIAL]
-router.post("/addstadiums", addStadiums);
+router.post("/", addStadiums);
 
-// AGREGAR UN EQUIPO
-router.post("/addstadium", addOneStadium);
+// AGREGAR UN ESTADIO
+router.post("/add", addOneStadium);
+
+// EDITAR UN ESTADIO
+router.put("/:id", updateOneStadium);
 
 // BORRAR TODOS LOS ESTADIOS
-router.delete("/deletestadium", deleteOneStadium);
+router.delete("/", deleteStadiums);
+
+// BORRAR UN ESTADIO
+router.delete("/:id", deleteOneStadium);
 
 module.exports = router;
