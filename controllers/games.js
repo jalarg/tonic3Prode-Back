@@ -12,14 +12,13 @@ module.exports = {
     }
   },
 
-  getAGameById: async (req, res) => {
-    let game;
+  getGamesByTournamentId: async (req, res) => {
     try {
-      game = await Games.findById(req.params.id).populate(
+      const games = await Games.find({ tournaments: req.params.id }).populate(
         "tournaments",
         "title"
       );
-      res.send(game);
+      res.send(games);
     } catch (error) {
       res.status(500).send(error);
     }
