@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getAll,
-  getAGameById,
+  getGamesByTournamentId,
   adminCreateAGame,
   bulkCreateAGames,
   generateFutureGames,
@@ -15,8 +15,8 @@ const {
 // find all the games
 router.get("/", getAll);
 
-// find a game by ID
-router.get("/:id", getAGameById);
+// find games by tournament ID
+router.get("/:id", getGamesByTournamentId);
 
 //admin create a stage of games [NUEVA RUTA]
 router.post("/:id", bulkCreateAGames);
