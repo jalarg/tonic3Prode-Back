@@ -15,6 +15,16 @@ module.exports = {
 
   // RUTAS PARA UPDATE RAPIDO CON SEED ARMADO
 
+  searchStadium: async (req, res, next) => {
+    try {
+      const { name } = req.params;
+      const team = await Stadiums.findOne({ name: { $eq: name } }).exec();
+      res.send(team);
+    } catch (err) {
+      next(err);
+    }
+  },
+
   addStadiums: async (req, res, next) => {
     try {
       const stadiums = stadiumsArgentina.map((name) => ({ name }));
@@ -25,6 +35,7 @@ module.exports = {
       next(err);
     }
   },
+
 
   // RUTAS CON PERMISOS DE ADMINISTRADOR
 
@@ -45,6 +56,7 @@ module.exports = {
       next(err);
     }
   },
+
   updateOneStadium: async (req, res, next) => {
     const stadiumId = req.params.id;
     const { updates, uid } = req.body;

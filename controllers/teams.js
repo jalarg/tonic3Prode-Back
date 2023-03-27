@@ -23,6 +23,7 @@ module.exports = {
     }
   },
 
+
   // RUTAS CON PERMISOS DE ADMINISTRADOR
 
   createOneTeam: async (req, res, next) => {
@@ -34,6 +35,18 @@ module.exports = {
     if (user.rol !== "superAdmin" && user.rol !== "admin") {
       return res.status(403).send("You are not allowed to do this action");
     }
+
+  searchTeam: async (req, res, next) => {
+    try {
+      const { name } = req.params;
+      const team = await Teams.findOne({ name: { $eq: name } }).exec();
+      res.send(team);
+    } catch (err) {
+      next(err);
+    }
+  },
+  updateOneTeam: async (req, res, next) => {
+
     try {
       const newTeam = new Teams(team);
       const savedTeam = await newTeam.save();
