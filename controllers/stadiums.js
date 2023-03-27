@@ -3,6 +3,7 @@ const stadiumsArgentina = require("../seed/stadiums");
 
 module.exports = {
   // RUTAS CON PERMISOS GENERALES
+  
   getAll: async (req, res, next) => {
     console.log(stadiumsArgentina);
     try {
@@ -12,8 +13,6 @@ module.exports = {
       next(err);
     }
   },
-
-  // RUTAS PARA UPDATE RAPIDO CON SEED ARMADO
 
   searchStadium: async (req, res, next) => {
     try {
@@ -25,6 +24,8 @@ module.exports = {
     }
   },
 
+  // RUTAS PARA UPDATE RAPIDO CON SEED ARMADO
+
   addStadiums: async (req, res, next) => {
     try {
       const stadiums = stadiumsArgentina.map((name) => ({ name }));
@@ -35,7 +36,6 @@ module.exports = {
       next(err);
     }
   },
-
 
   // RUTAS CON PERMISOS DE ADMINISTRADOR
 
