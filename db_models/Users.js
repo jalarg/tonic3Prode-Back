@@ -21,7 +21,7 @@ schema.virtual("fullName").get(function () {
 });
 
 // SET VIRTUAL TOURNAMENTS
-schema.virtual("tournaments").get(function () {
+schema.virtual("tournamentScores").get(function () {
   let tournaments = {};
   Object.keys(this.scores).forEach((tournamentId) => {
     tournaments[tournamentId] = {

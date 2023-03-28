@@ -9,6 +9,7 @@ const {
   getOne,
   getAllTournamentTeams,
   getOneTournamentTeam,
+  addUsertoTournament,
   updateOne,
   searchTournament,
   bulkCreateATeams
@@ -27,6 +28,9 @@ router.get("/:_id/teams", getAllTournamentTeams);
 
 //OBTENER UN EQUIPO DE UN TORNEO (NO FUNCIONA)
 router.get("/:_id/:name/team", getOneTournamentTeam);
+
+//AGREGAR USERS A UN TORNEO
+router.post("/:_id", addUsertoTournament); 
 
 //BUSCAR (SEARCH) UN TORNEO (EN PRUEBA)
 router.get("/search/:title", searchTournament);
