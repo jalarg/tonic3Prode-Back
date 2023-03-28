@@ -11,11 +11,24 @@ const schema = Schema({
   address: { type: String },
   country: { type: String },
   cellphone: { type: String },
+  tournaments: [{ type: Schema.Types.ObjectId, ref: "tournaments" }],
+  scores: { type: Object, default: {} },
 });
 
-// SET VIRTUAL
+// SET VIRTUAL FULL NAME
 schema.virtual("fullName").get(function () {
   return `${this.name} ${this.lastName}`;
+});
+
+// SET VIRTUAL TOURNAMENTS
+schema.virtual("tournaments").get(function () {
+  let tournaments = {};
+  Object.keys(this.scores).forEach((tournamentId) => {
+    tournaments[tournamentId] = {
+      score: this.scores[tournamentId],
+    };
+  });
+  return tournaments;
 });
 
 const model = mongoose.model("users", schema);

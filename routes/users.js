@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getAll,
   findOneUser,
+  getAllUsersFromOneTournament,
   createOneUser,
   createOneAdmin,
   deleteUsers,
@@ -16,6 +17,10 @@ router.get("/", getAll);
 
 // OBTENER UN USUARIO
 router.get("/:username", findOneUser);
+
+// OBTENER TODOS LOS USUARIOS DE UN TORNEO ESPECIFICO
+
+router.get("/tournament/:id", getAllUsersFromOneTournament);
 
 // CREAR UN USUARIO
 router.post("/", createOneUser);
