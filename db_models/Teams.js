@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const schema = Schema({
-    name: {type: String, required: true},
-    logo_url: {type: String, required: true},
-    foundation: {type: String, required: true},
-    origin: {type: String, required: true}, 
+  name: { type: String, required: true },
+  logo_url: { type: String, required: true },
+  foundation: { type: String, required: true },
+  origin: { type: String, required: true },
+  shortName: { type: String, required: true },
 });
 
 
