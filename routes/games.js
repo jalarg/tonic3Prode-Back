@@ -5,12 +5,15 @@ const {
   getGamesByTournamentId,
   adminCreateAGame,
   bulkCreateAGames,
+  addOneResult,
+  addManyResults,
   generateFutureGames,
   adminEditAGame,
   adminDeleteAGame,
-  addResult,
   deleteGames,
 } = require("../controllers/games");
+
+//----------- RUTAS GENERALES -------------//
 
 // find all the games
 router.get("/", getAll);
@@ -18,13 +21,19 @@ router.get("/", getAll);
 // find games by tournament ID
 router.get("/:id", getGamesByTournamentId);
 
-//admin create a stage of games [NUEVA RUTA]
-router.post("/:id", bulkCreateAGames);
+//-----------RUTAS PARA ADMINISTRADORES-------------//
 
-// Create future games NUEVA RUTA]
-router.get("/newstage/:id",  generateFutureGames)
+// crate a stage of many games
+router.post("/admin/:id", bulkCreateAGames);
 
-router.put("/result/:id", addResult);
+// update many results 
+router.put("/admin", addManyResults);
+
+// update one result
+router.put("/admin/result/:id", addOneResult);
+
+// Create future games [PENDIENTE LOGICA]
+router.get("/admin/newstage/:id",  generateFutureGames)
 
 //admin create a game
 router.post("/admin/create", adminCreateAGame); //esta no iría
@@ -36,6 +45,6 @@ router.put("/admin/edit/:id", adminEditAGame);
 router.delete("/admin/delete/:id", adminDeleteAGame); //esta no iría
 
 //admin delete all games [NUEVA RUTA]
-router.delete("/", deleteGames); 
+router.delete("/admin", deleteGames); 
 
 module.exports = router;

@@ -2,19 +2,24 @@ const express = require("express");
 const router = express.Router();
 const { getAll, addOnePrize, changeOnePrize, deletePrizes, deleteOnePrize } = require("../controllers/prizes");
 
-// OBTENER TODOS LOS EQUIPOS
+//-----------RUTAS GENERALES-------------//
+
+// OBTENER TODOS LOS PREMIOS    
 router.get("/", getAll);
 
+
+//-----------RUTAS PARA ADMINISTRADORES-------------//
+
 // AGREGAR PREMIOS A UN TORNEO
-router.post("/addprize", addOnePrize);
+router.post("admin/addprize", addOnePrize);
 
 // MODIFICAR PREMIOS A UN TORNEO [PENDIENTE]
-router.put("/updateprize/:id", changeOnePrize);
+router.put("admin/:id", changeOnePrize);
 
 // BORRAR TODOS LOS PREMIOS
-router.delete("/deleteallprizes", deletePrizes);
+router.delete("/admin", deletePrizes);
 
-// BORRAR PREMIO
-router.delete("/deleteprize", deleteOnePrize);
+// BORRAR UN PREMIO
+router.delete("admin/:id", deleteOnePrize);
 
 module.exports = router;

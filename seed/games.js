@@ -1,3 +1,4 @@
+// EJEMPLO CREAR GAME
 const gamesData = [
   [
     {
@@ -72,5 +73,32 @@ const gamesData = [
     },
   ],
 ];
+
+
+// EJEMPLO CARGAR RESULTADO DE A VARIOS
+
+const bulkresult = {     
+  "uid": "4",
+  "results": [
+        {
+        "gameId": "6421dcff52fda86ff43069b4",
+        "homeTeam": "River Plate",
+        "awayTeam": "Racing de Córdoba",
+        "homeTeamScore": 7,
+        "awayTeamScore": 1,
+        "winner": "River Plate"
+        },
+        {
+        "gameId": "6421dcff52fda86ff43069b6",
+        "homeTeam": "Talleres",
+        "awayTeam": "Chacarita Juniors",
+        "homeTeamScore": 0,
+        "awayTeamScore": 0,
+        "winner": "Talleres"
+        }
+        ]
+}
+
+
 
 module.exports = gamesData;
