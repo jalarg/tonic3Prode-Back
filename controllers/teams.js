@@ -24,7 +24,7 @@ module.exports = {
 
   // RUTAS PARA UPDATE RAPIDO CON SEED ARMADO
 
-  updateTeams: async (req, res, next) => {
+  bulkCreateTeams: async (req, res, next) => {
     try {
       const data = await Teams.insertMany(teams);
       res.send(data);
@@ -44,16 +44,13 @@ module.exports = {
     if (user.rol !== "superAdmin" && user.rol !== "admin") {
       return res.status(403).send("You are not allowed to do this action");
     }
-  },
-
-  updateOneTeam: async (req, res, next) => {
-    try {
+     try {
       const newTeam = new Teams(team);
       const savedTeam = await newTeam.save();
       res.send(savedTeam);
-    } catch (err) {
-      next(err);
-    }
+     } catch (err) {
+       next(err);
+     }
   },
 
   updateOneTeam: async (req, res, next) => {

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   getAll,
-  updateTeams,
+  bulkCreateTeams,
   searchTeam,
   createOneTeam,
   updateOneTeam,
@@ -20,7 +20,7 @@ router.get("/", getAll);
 router.get("/search/:name", searchTeam)
 
 // CREAR TODOS LOS EQUIPOS [BULK CREATE - SEED INICIAL]
-router.post("/", updateTeams);
+router.post("/", bulkCreateTeams);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
