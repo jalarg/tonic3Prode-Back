@@ -11,6 +11,7 @@ const {
   deleteOneTeam,
 } = require("../controllers/teams");
 
+//-----------RUTAS GENERALES-------------//
 
 // OBTENER TODOS LOS EQUIPOS
 router.get("/", getAll);
@@ -21,16 +22,18 @@ router.get("/search/:name", searchTeam)
 // CREAR TODOS LOS EQUIPOS [BULK CREATE - SEED INICIAL]
 router.post("/", updateTeams);
 
-// AGREGAR UN EQUIPO
-router.post("/add", createOneTeam);
+//-----------RUTAS PARA ADMINISTRADORES-------------//
 
-router.put("/:id", updateOneTeam);
+// AGREGAR UN EQUIPO
+router.post("admin/", createOneTeam);
+
+router.put("admin/:id", updateOneTeam);
 
 // BORRAR TODOS LOS EQUIPOS
-router.delete("/", deleteTeams);
+router.delete("admin/", deleteTeams);
 
 // BORRAR UN EQUIPO
-router.delete("/:id", deleteOneTeam);
+router.delete("admin/:id", deleteOneTeam);
 
 
 module.exports = router;

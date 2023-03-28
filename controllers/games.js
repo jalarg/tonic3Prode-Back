@@ -12,14 +12,13 @@ module.exports = {
     }
   },
 
-  getAGameById: async (req, res) => {
-    let game;
+  getGamesByTournamentId: async (req, res) => {
     try {
-      game = await Games.findById(req.params.id).populate(
+      const games = await Games.find({ tournaments: req.params.id }).populate(
         "tournaments",
         "title"
       );
-      res.send(game);
+      res.send(games);
     } catch (error) {
       res.status(500).send(error);
     }
@@ -42,7 +41,7 @@ module.exports = {
 
   bulkCreateAGames: async (req, res, next) => {
     const tournamentId = req.params.id;
-    const { stage, status, details, result, uid } = req.body; // AGREGAR gamesData que va a venir del front
+    const { stage, details, uid } = req.body; // AGREGAR gamesData que va a venir del front
     const user = await Users.findOne({ uid });
     if (!user) {
       return res.status(404).send("User not found");
@@ -58,8 +57,8 @@ module.exports = {
       const games = [];
 
       for (let i = 0; i < gamesData.length; i++) {
-        const team1 = gamesData[i][0];
-        const team2 = gamesData[i][1];
+        const homeTeam = gamesData[i][0];
+        const awayTeam = gamesData[i][1];
         const dayOfTheWeek = gamesData[i][2].dayOfTheWeek;
         const dayOfTheMonth = gamesData[i][2].dayOfTheMonth;
         const month = gamesData[i][2].month;
@@ -70,20 +69,124 @@ module.exports = {
           tournaments: tournamentId,
           gameIndex: gameIndex,
           stage,
-          status,
           details,
-          teams: [team1, team2],
+          teams: [homeTeam, awayTeam],
           dayOfTheWeek: dayOfTheWeek,
           dayOfTheMonth: dayOfTheMonth,
           month: month,
           hour: hour,
-          result,
         });
-
         games.push(newGame);
         await newGame.save();
       }
       res.send("Los encuentros se han creado correctamente");
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  addOneResult: async (req, res, next) => {
+    const gameId = req.params.id;
+    const { homeTeam, awayTeam, homeTeamScore, awayTeamScore, winner, uid } =
+      req.body;
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+    try {
+      const result = {
+        homeTeam,
+        awayTeam,
+        homeTeamScore,
+        awayTeamScore,
+        winner,
+      };
+
+      const game = await Games.findOne({ _id: gameId });
+      // Validar que los equipos ingresados existan
+      if (
+        !game.teams[0].name.includes(team1) ||
+        !game.teams[1].name.includes(team2)
+      ) {
+        return res.status(400).send({ error: "Invalid or missing teams" });
+      }
+      //varificar que los resultados sean correctos
+      if (score1 < 0 || score2 < 0) {
+        return res.status(400).send({ error: "Invalid or missing scores" });
+      }
+      if (winner !== team1 && winner !== team2) {
+        return res.status(400).send({ error: "Invalid or missing winner" });
+      }
+      const updatedGame = await Games.findOneAndUpdate(
+        { _id: gameId },
+        { result: result },
+        { new: true }
+      );
+      res.send(updatedGame);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  addManyResults: async (req, res, next) => {
+    const results = req.body.results;
+    const uid = req.body.uid;
+
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+
+    try {
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        const gameId = result.gameId;
+        const homeTeam = result.homeTeam;
+        const awayTeam = result.awayTeam;
+        const homeTeamScore = result.homeTeamScore;
+        const awayTeamScore = result.awayTeamScore;
+        const winner = result.winner;
+
+        const game = await Games.findOne({ _id: gameId });
+
+        // Validar que los equipos ingresados existan
+        if (
+          !game.teams[0].name.includes(homeTeam) ||
+          !game.teams[1].name.includes(awayTeam)
+        ) {
+          return res.status(400).send({ error: "Invalid or missing teams" });
+        }
+
+        // Validar que los resultados sean correctos
+        if (homeTeamScore < 0 || awayTeamScore < 0) {
+          return res.status(400).send({ error: "Invalid or missing scores" });
+        }
+        if (winner !== homeTeam && winner !== awayTeam) {
+          return res.status(400).send({ error: "Invalid or missing winner" });
+        }
+
+        const updatedGame = await Games.findOneAndUpdate(
+          { _id: gameId },
+          {
+            result: {
+              homeTeam,
+              awayTeam,
+              homeTeamScore,
+              awayTeamScore,
+              winner,
+            },
+          },
+          { new: true }
+        );
+      }
+
+      res.send("Los resultados se han agregado correctamente");
     } catch (err) {
       next(err);
     }
@@ -113,51 +216,6 @@ module.exports = {
   //---- EN PROCESO
 
   // RUTA PARA AGREGAR LOS RESULTADOS DE UN PARTIDO
-
-  addResult: async (req, res, next) => {
-    const gameId = req.params.id;
-    const { team1, team2, score1, score2, winner, uid } = req.body;
-    const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
-    try {
-      const result = {
-        team1,
-        team2,
-        score1,
-        score2,
-        winner,
-      };
-
-      const game = await Games.findOne({ _id: gameId });
-      // Validar que los equipos ingresados existan
-      if (
-        !game.teams[0].name.includes(team1) ||
-        !game.teams[1].name.includes(team2)
-      ) {
-        return res.status(400).send({ error: "Invalid or missing teams" });
-      }
-      //varificar que los resultados sean correctos
-      if (score1 < 0 || score2 < 0) {
-        return res.status(400).send({ error: "Invalid or missing scores" });
-      }
-      if (winner !== team1 && winner !== team2) {
-        return res.status(400).send({ error: "Invalid or missing winner" });
-      }
-      const updatedGame = await Games.findOneAndUpdate(
-        { _id: gameId },
-        { result: result },
-        { new: true }
-      );
-      res.send(updatedGame);
-    } catch (err) {
-      next(err);
-    }
-  },
 
   adminEditAGame: async (req, res) => {
     let game;
