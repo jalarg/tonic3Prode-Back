@@ -6,6 +6,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "25 de mayo de 1901",
     origin: "Buenos Aires, Argentina",
+    shortName: "RIV"
   },
   {
     name: "Racing de Córdoba",
@@ -14,6 +15,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1924",
     origin: "Córdoba, Argentina",
+    shortName: 'RDC'
   },
   {
     name: "Talleres",
@@ -22,6 +24,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "12 de octubre de 1913",
     origin: "Córdoba, Argentina",
+    shortName: 'TAL'
   },
   {
     name: "Chacarita Juniors",
@@ -30,6 +33,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "1 de mayo de 1906",
     origin: "San Martín, Buenos Aires, Argentina",
+    shortName: 'CHA'
   },
   {
     name: "Club Atlético Colón",
@@ -38,6 +42,7 @@ const teams = [
     division: "Superliga Argentina",
     foundation: "5 de mayo de 1905",
     origin: "Santa Fe, Argentina",
+    shortName: 'COL'
   },
   {
     name: "Colegiales",
@@ -46,6 +51,7 @@ const teams = [
     division: "Primera B Metropolitana",
     foundation: "1 de mayo de 1909",
     origin: "Munro, Buenos Aires, Argentina",
+    shortName: 'COL'
   },
   {
     name: "Lanús",
@@ -54,6 +60,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "3 de enero de 1915",
     origin: "Lanús, Buenos Aires, Argentina",
+    shortName: 'LAN'
   },
   {
     name: "Sol de Mayo",
@@ -62,6 +69,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1920",
     origin: "Viedma, Río Negro, Argentina",
+    shortName: 'SDM'
   },
   {
     name: "Club Atlético Gimnasia y Esgrima",
@@ -70,6 +78,7 @@ const teams = [
     division: "Superliga Argentina",
     foundation: "3 de junio de 1887",
     origin: "La Plata, Buenos Aires, Argentina",
+    shortName: 'GIM'
   },
   {
     name: "Excursionistas",
@@ -78,6 +87,7 @@ const teams = [
     division: "Primera C Metropolitana",
     foundation: "1910",
     origin: "Belgrano, Buenos Aires, Argentina",
+    shortName: 'EXC'
   },
   {
     name: "Unión",
@@ -86,6 +96,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "15 de abril de 1907",
     origin: "Santa Fe, Argentina",
+    shortName: 'UNI'
   },
   {
     name: "Almagro",
@@ -94,6 +105,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "6 de enero de 1911",
     origin: "José Ingenieros, Buenos Aires, Argentina",
+    shortName: 'ALM'
   },
   {
     name: "Club Atlético Barracas Central",
@@ -102,6 +114,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "5 de abril de 1904",
     origin: "Barracas, Ciudad de Buenos Aires, Argentina",
+    shortName: 'BRC'
   },
   {
     name: "Estudiantes (Caseros)",
@@ -110,6 +123,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "1898",
     origin: "Caseros, Buenos Aires, Argentina",
+    shortName: 'ESC'
   },
   {
     name: "Boca Juniors",
@@ -118,6 +132,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "3 de abril de 1905",
     origin: "La Boca, Buenos Aires, Argentina",
+    shortName: 'BOC'
   },
   {
     name: "Olimpo",
@@ -126,6 +141,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1910",
     origin: "Bahía Blanca, Buenos Aires, Argentina",
+    shortName: 'OLI'
   },
   {
     name: "Racing Club",
@@ -134,6 +150,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "25 de marzo de 1903",
     origin: "Avellaneda, Argentina",
+    shortName: 'RAC'
   },
   {
     name: "San Martín de Formosa",
@@ -142,6 +159,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1922",
     origin: "Formosa, Argentina",
+    shortName: 'SMF'
   },
   {
     name: "San Martín (Tucumán)",
@@ -150,6 +168,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "2 de noviembre de 1909",
     origin: "San Miguel de Tucumán, Tucumán, Argentina",
+    shortName: 'SNT'
   },
   {
     name: "Deportivo Morón",
@@ -158,6 +177,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "20 de junio de 1947",
     origin: "Morón, Buenos Aires, Argentina",
+    shortName: 'DMO'
   },
   {
     name: "Instituto",
@@ -166,6 +186,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "8 de agosto de 1918",
     origin: "Córdoba, Argentina",
+    shortName: 'INS'
   },
   {
     name: "Deportivo Riestra",
@@ -174,6 +195,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "1931",
     origin: "Nueva Pompeya, Buenos Aires, Argentina",
+    shortName: 'DRI'
   },
   {
     name: "Huracán",
@@ -182,6 +204,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de noviembre de 1908",
     origin: "Buenos Aires, Argentina",
+    shortName: 'HUR'
   },
   {
     name: "Yupanqui",
@@ -190,6 +213,7 @@ const teams = [
     division: "Primera D Metropolitana",
     foundation: "1922",
     origin: "Villa Lugano, Buenos Aires, Argentina",
+    shortName: 'YUP'
   },
   {
     name: "Independiente",
@@ -198,6 +222,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "4 de enero de 1905",
     origin: "Avellaneda, Argentina",
+    shortName: 'IND'
   },
   {
     name: "Club Ciudad de Bolívar",
@@ -206,6 +231,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1933",
     origin: "Bolívar, Buenos Aires, Argentina",
+    shortName: 'CCB'
   },
   {
     name: "Central Córdoba (Santiago del Estero)",
@@ -214,6 +240,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "3 de abril de 1919",
     origin: "Santiago del Estero, Argentina",
+    shortName: 'CCO'
   },
   {
     name: "Comunicaciones",
@@ -222,6 +249,7 @@ const teams = [
     division: "Primera B Metropolitana",
     foundation: "21 de octubre de 1931",
     origin: "Agronomía, Buenos Aires, Argentina",
+    shortName: 'COM'
   },
   {
     name: "Gimnasia y Esgrima de Mendoza",
@@ -230,6 +258,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "1 de julio de 1908",
     origin: "Mendoza, Argentina",
+    shortName: 'GEM'
   },
   {
     name: "All Boys",
@@ -238,6 +267,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "15 de marzo de 1913",
     origin: "Floresta, Buenos Aires, Argentina",
+    shortName: 'ALB'
   },
   {
     name: "Club Atlético Estudiantes",
@@ -246,6 +276,7 @@ const teams = [
     division: "Superliga Argentina",
     foundation: "4 de agosto de 1905",
     origin: "La Plata, Buenos Aires, Argentina",
+    shortName: 'EST'
   },
   {
     name: "Independiente (CH)",
@@ -254,6 +285,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1928",
     origin: "Chilecito, La Rioja, Argentina",
+    shortName: 'INC'
   },
   {
     name: "Club Atlético Arsenal",
@@ -262,6 +294,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "11 de enero de 1957",
     origin: "Sarandí, Provincia de Buenos Aires, Argentina",
+    shortName: 'ARS'
   },
   {
     name: "Villa Mitre",
@@ -270,6 +303,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1929",
     origin: "Bahía Blanca, Buenos Aires, Argentina",
+    shortName: 'VMI'
   },
   {
     name: "Godoy Cruz",
@@ -278,6 +312,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de junio de 1921",
     origin: "Mendoza, Argentina",
+    shortName: 'GOD'
   },
   {
     name: "Defensores Unidos",
@@ -286,6 +321,7 @@ const teams = [
     division: "Primera B Metropolitana",
     foundation: "25 de marzo de 1916",
     origin: "Zárate, Buenos Aires, Argentina",
+    shortName: 'DFU'
   },
   {
     name: "Sarmiento",
@@ -294,6 +330,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de noviembre de 1911",
     origin: "Junín, Buenos Aires, Argentina",
+    shortName: 'SAR'
   },
   {
     name: "Chaco For Ever",
@@ -302,6 +339,7 @@ const teams = [
     division: "Federal A",
     foundation: "1913",
     origin: "Resistencia, Chaco, Argentina",
+    shortName: 'CFE'
   },
   {
     name: "Rosario Central",
@@ -310,6 +348,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "24 de diciembre de 1889",
     origin: "Rosario, Argentina",
+    shortName: 'ROS'
   },
   {
     name: "Central Norte",
@@ -318,6 +357,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1919",
     origin: "Salta, Argentina",
+    shortName: 'CNS'
   },
   {
     name: "Banfield",
@@ -326,6 +366,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "21 de enero de 1896",
     origin: "Banfield, Buenos Aires, Argentina",
+    shortName: 'BAN'
   },
   {
     name: "Argentino de Merlo",
@@ -334,6 +375,7 @@ const teams = [
     division: "Primera C Metropolitana",
     foundation: "1960",
     origin: "Merlo, Buenos Aires, Argentina",
+    shortName: 'ARM'
   },
   {
     name: "Atlético Tucumán",
@@ -342,6 +384,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "27 de septiembre de 1902",
     origin: "San Miguel de Tucumán, Tucumán, Argentina",
+    shortName: 'ATL'
   },
   {
     name: "Estudiantes de Río Cuarto",
@@ -350,6 +393,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "6 de diciembre de 1912",
     origin: "Río Cuarto, Córdoba, Argentina",
+    shortName: 'ESR'
   },
   {
     name: "Club Atlético Defensa y Justicia",
@@ -358,6 +402,7 @@ const teams = [
     division: "Superliga Argentina",
     foundation: "20 de marzo de 1935",
     origin: "Florencio Varela, Buenos Aires, Argentina",
+    shortName: 'DEF'
   },
   {
     name: "Ituzaingó",
@@ -366,6 +411,7 @@ const teams = [
     division: "Primera B Metropolitana",
     foundation: "1 de julio de 1948",
     origin: "Ituzaingó, Buenos Aires, Argentina",
+    shortName: 'ITU'
   },
   {
     name: "Tigre",
@@ -374,6 +420,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "3 de agosto de 1902",
     origin: "Victoria, Buenos Aires, Argentina",
+    shortName: 'TIG'
   },
   {
     name: "Centro Español",
@@ -382,6 +429,7 @@ const teams = [
     division: "Primera D Metropolitana",
     foundation: "1956",
     origin: "Tapiales, Buenos Aires, Argentina",
+    shortName: 'CES'
   },
   {
     name: "San Lorenzo",
@@ -390,6 +438,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de abril de 1908",
     origin: "Buenos Aires, Argentina",
+    shortName: 'SLO'
   },
   {
     name: "Sarmiento de Resistencia",
@@ -398,6 +447,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1911",
     origin: "Resistencia, Chaco, Argentina",
+    shortName: 'SMR'
   },
   {
     name: "Platense",
@@ -406,6 +456,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "25 de mayo de 1905",
     origin: "Vicente López, Buenos Aires, Argentina",
+    shortName: 'PLT'
   },
   {
     name: "Defensores de Belgrano",
@@ -414,6 +465,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "25 de mayo de 1906",
     origin: "Núñez, Buenos Aires, Argentina",
+    shortName: 'DBE'
   },
   {
     name: "Belgrano",
@@ -422,6 +474,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "19 de marzo de 1905",
     origin: "Córdoba, Argentina",
+    shortName: 'BEL'
   },
   {
     name: "Independiente Rivadavia",
@@ -430,6 +483,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "29 de marzo de 1913",
     origin: "Mendoza, Argentina",
+    shortName: 'INR'
   },
   {
     name: "Newell's Old Boys",
@@ -438,6 +492,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "3 de noviembre de 1903",
     origin: "Rosario, Santa Fe, Argentina",
+    shortName: 'NEW'
   },
   {
     name: "Claypole",
@@ -446,6 +501,7 @@ const teams = [
     division: "Primera C Metropolitana",
     foundation: "1944",
     origin: "Claypole, Buenos Aires, Argentina",
+    shortName: 'CLP'
   },
   {
     name: "Patronato",
@@ -454,6 +510,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de febrero de 1914",
     origin: "Paraná, Entre Ríos, Argentina",
+    shortName: 'PAT'
   },
   {
     name: "Gimnasia y Tiro de Salta",
@@ -462,6 +519,7 @@ const teams = [
     division: "Torneo Federal A",
     foundation: "1930",
     origin: "Salta, Argentina",
+    shortName: 'GTS'
   },
   {
     name: "Argentinos Juniors",
@@ -470,6 +528,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "15 de agosto de 1904",
     origin: "La Paternal, Buenos Aires, Argentina",
+    shortName: 'ARG'
   },
   {
     name: "Deportivo Armenio",
@@ -478,6 +537,7 @@ const teams = [
     division: "Primera B Metropolitana",
     foundation: "14 de agosto de 1962",
     origin: "Ingeniero Maschwitz",
+    shortName: 'DPA'
   },
   {
     name: "Club Atlético Aldosivi",
@@ -486,6 +546,7 @@ const teams = [
     division: "Superliga Argentina",
     foundation: "29 de marzo de 1913",
     origin: "Mar del Plata, Buenos Aires, Argentina",
+    shortName: 'ALD'
   },
   {
     name: "San Martín (San Juan)",
@@ -494,6 +555,7 @@ const teams = [
     division: "Primera Nacional",
     foundation: "27 de septiembre de 1907",
     origin: "San Juan, Argentina",
+    shortName: 'SNS'
   },
   {
     name: "Vélez Sarsfield",
@@ -502,6 +564,7 @@ const teams = [
     division: "Liga Profesional",
     foundation: "1 de enero de 1910",
     origin: "Buenos Aires, Argentina",
+    shortName: 'VEL'
   },
   {
     name: "Deportivo Español",
@@ -510,6 +573,7 @@ const teams = [
     division: "Primera C Metropolitana",
     foundation: "1956",
     origin: "Buenos Aires, Argentina",
+    shortName: 'DEP'
   },
 ];
 

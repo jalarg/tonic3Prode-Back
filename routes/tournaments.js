@@ -33,6 +33,7 @@ router.get("/search/:title", searchTournament);
 
 //-----------RUTAS PARA ADMINISTRADORES -------------//
 
+
 // AGREGAR UN TORNEO 
 router.post("/admin", createTournament);
 
@@ -46,7 +47,9 @@ router.put("/admin/:_id", updateOne);
 router.delete("/admin/:_id", deleteOne);
 
 //BORRAR TODOS LOS TORNEOS
+
 router.delete("/admin", deleteAll);
+
 
 
 module.exports = router;
