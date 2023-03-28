@@ -1,9 +1,9 @@
 const { Stadiums, Users } = require("../db_models");
-const stadiumsArgentina = require("../seed/stadiums");
+const stadiums = require("../seed/stadiums");
 
 module.exports = {
   // RUTAS CON PERMISOS GENERALES
-  
+
   getAll: async (req, res, next) => {
     console.log(stadiumsArgentina);
     try {
@@ -26,11 +26,9 @@ module.exports = {
 
   // RUTAS PARA UPDATE RAPIDO CON SEED ARMADO
 
-  addStadiums: async (req, res, next) => {
+  bulkCreateStadiums: async (req, res, next) => {
     try {
-      const stadiums = stadiumsArgentina.map((name) => ({ name }));
       const data = await Stadiums.insertMany(stadiums);
-      console.log(`${data.length} stadiums saved`);
       res.send(data);
     } catch (err) {
       next(err);

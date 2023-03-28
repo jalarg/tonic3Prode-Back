@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   getAll,
   searchStadium,
-  addStadiums,
+  bulkCreateStadiums,
   addOneStadium,
   updateOneStadium,
   deleteStadiums,
@@ -19,20 +19,20 @@ router.get("/", getAll);
 router.get("/search/:name", searchStadium);
 
 // SUBIR JSON DE ESTADIOS [BULK CREATE - SEED INICIAL]
-router.post("/", addStadiums);
+router.post("/", bulkCreateStadiums);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
 // AGREGAR UN ESTADIO
-router.post("admin/add", addOneStadium);
+router.post("/admin/add", addOneStadium);
 
 // EDITAR UN ESTADIO
-router.put("admin/:id", updateOneStadium);
+router.put("/admin/:id", updateOneStadium);
 
 // BORRAR TODOS LOS ESTADIOS
-router.delete("admin/", deleteStadiums);
+router.delete("/admin/", deleteStadiums);
 
 // BORRAR UN ESTADIO
-router.delete("admin/:id", deleteOneStadium);
+router.delete("/admin/:id", deleteOneStadium);
 
 module.exports = router;
