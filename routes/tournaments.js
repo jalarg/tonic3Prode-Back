@@ -13,6 +13,8 @@ const {
   searchTournament
 } = require("../controllers/tournaments");
 
+//-----------RUTAS GENERALES -------------//
+
 // OBTENER TODOS LOS TORNEOS
 router.get("/", getAll);
 
@@ -28,19 +30,23 @@ router.get("/:_id/:name/team", getOneTournamentTeam);
 //BUSCAR UN TORNEO
 router.get("/search/:title", searchTournament);
 
+//-----------RUTAS PARA SEED RAPIDO -------------//
+
 // AGREGAR UN TORNEO [SEED INICIAL]
 router.post("/", createTournament);
 
+//-----------RUTAS PARA ADMINISTRADORES -------------//
+
 //AGREGAR TEAMS AL TORNEO
-router.put("/:_id/team", assingTeams);
+router.put("admin/:_id/team", assingTeams);
 
 // MODIFICAR UN TORNEO
-router.put("/:_id", updateOne);
+router.put("admin/:_id", updateOne);
 
 // BORRAR UN TORNEO
-router.delete("/:_id", deleteOne);
+router.delete("admin/:_id", deleteOne);
 
 //BORRAR TODOS LOS TORNEOS
-router.delete("/", deleteAll);
+router.delete("admin/", deleteAll);
 
 module.exports = router;

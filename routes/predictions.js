@@ -9,6 +9,8 @@ const {
   deleteOnePrediction,
 } = require("../controllers/predictions");
 
+//-----------RUTAS GENERALES -------------//
+
 // OBTENER TODAS LAS PREDICCIONES  
 router.get("/", getAll);
 

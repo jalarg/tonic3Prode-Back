@@ -10,25 +10,29 @@ const {
   deleteOneStadium,
 } = require("../controllers/stadiums");
 
-// OBTENER TODOS LOS ESTADIOS
+//-----------RUTAS GENERALES-------------//
+
+// RUTAS PARA BUSCAR TODOS LOS ESTADIOS
 router.get("/", getAll);
 
-//SEARCH DE UN ESTADIO
+//SEARCH DE UN ESTADIO POR NOMBRE
 router.get("/search/:name", searchStadium);
 
 // SUBIR JSON DE ESTADIOS [BULK CREATE - SEED INICIAL]
 router.post("/", addStadiums);
 
+//-----------RUTAS PARA ADMINISTRADORES-------------//
+
 // AGREGAR UN ESTADIO
-router.post("/add", addOneStadium);
+router.post("admin/add", addOneStadium);
 
 // EDITAR UN ESTADIO
-router.put("/:id", updateOneStadium);
+router.put("admin/:id", updateOneStadium);
 
 // BORRAR TODOS LOS ESTADIOS
-router.delete("/", deleteStadiums);
+router.delete("admin/", deleteStadiums);
 
 // BORRAR UN ESTADIO
-router.delete("/:id", deleteOneStadium);
+router.delete("admin/:id", deleteOneStadium);
 
 module.exports = router;
