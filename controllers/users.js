@@ -22,6 +22,20 @@ module.exports = {
       next(err);
     }
   },
+  getAllUsersFromOneTournament: async (req, res, next) => {
+    try {
+      const tournamentId = req.params.id;
+      const users = await Users.find({ tournaments: tournamentId }).populate(
+        "tournaments"
+      );
+      if (!users) {
+        return res.status(404).send("Users not found");
+      }
+      res.send(users);
+    } catch (err) {
+      next(err);
+    }
+  },
   createOneUser: async (req, res, next) => {
     try {
       const newUser = new Users(req.body);
@@ -36,7 +50,7 @@ module.exports = {
   // SOLO SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
 
   createOneAdmin: async (req, res, next) => {
-    console.log(req.body)
+    console.log(req.body);
     const { uid, admin } = req.body;
     const user = await Users.findOne({ uid });
     if (!user) {
