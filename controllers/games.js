@@ -41,7 +41,7 @@ module.exports = {
 
   bulkCreateAGames: async (req, res, next) => {
     const tournamentId = req.params.id;
-    const { stage, status, details, result, uid } = req.body; // AGREGAR gamesData que va a venir del front
+    const { stage, details, uid } = req.body; // AGREGAR gamesData que va a venir del front
     const user = await Users.findOne({ uid });
     if (!user) {
       return res.status(404).send("User not found");
@@ -54,34 +54,31 @@ module.exports = {
         return res.status(400).send({ error: "Invalid or missing games data" });
       }
 
-      const games = [];
+       const games = [];
 
-      for (let i = 0; i < gamesData.length; i++) {
-        const team1 = gamesData[i][0];
-        const team2 = gamesData[i][1];
-        const dayOfTheWeek = gamesData[i][2].dayOfTheWeek;
-        const dayOfTheMonth = gamesData[i][2].dayOfTheMonth;
-        const month = gamesData[i][2].month;
-        const hour = gamesData[i][2].hour;
-        const gameIndex = i;
+       for (let i = 0; i < gamesData.length; i++) {
+         const homeTeam = gamesData[i][0];
+         const awayTeam = gamesData[i][1];
+         const dayOfTheWeek = gamesData[i][2].dayOfTheWeek;
+         const dayOfTheMonth = gamesData[i][2].dayOfTheMonth;
+         const month = gamesData[i][2].month;
+         const hour = gamesData[i][2].hour;
+         const gameIndex = i;
 
-        const newGame = new Games({
-          tournaments: tournamentId,
-          gameIndex: gameIndex,
-          stage,
-          status,
-          details,
-          teams: [team1, team2],
-          dayOfTheWeek: dayOfTheWeek,
-          dayOfTheMonth: dayOfTheMonth,
-          month: month,
-          hour: hour,
-          result,
-        });
-
-        games.push(newGame);
-        await newGame.save();
-      }
+         const newGame = new Games({
+           tournaments: tournamentId,
+           gameIndex: gameIndex,
+           stage,
+           details,
+           teams: [homeTeam, awayTeam],
+           dayOfTheWeek: dayOfTheWeek,
+           dayOfTheMonth: dayOfTheMonth,
+           month: month,
+           hour: hour,
+         });
+         games.push(newGame);
+         await newGame.save();
+       }
       res.send("Los encuentros se han creado correctamente");
     } catch (err) {
       next(err);
