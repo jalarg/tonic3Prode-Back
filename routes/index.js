@@ -6,13 +6,13 @@ const stadiums = require("./stadiums");
 const games = require("./games");
 const tournaments = require("./tournaments")
 const prizes = require("./prizes");
-const bets = require("./bets");
+const bets = require("./predictions");
 const users = require("./users");
 
 
 router.use("/teams", teams);
 router.use("/prizes", prizes);
-router.use("/bets", bets);
+router.use("/predictions", bets);
 router.use("/users", users);
 router.use("/tournaments", tournaments);
 router.use("/games", games);
