@@ -1,12 +1,11 @@
-const { Tournaments } = require("../db_models");
-const tournamentCopaArgentina = require("../seed/tournamentCA");
-const { Users } = require("../db_models/");
-const { where } = require("../db_models/Teams");
+const { Tournaments, Teams, Users } = require("../db_models");
 
 module.exports = {
   getAll: async (req, res, next) => {
     try {
-      const tournaments = await Tournaments.find().populate("teams");
+      const tournaments = await Tournaments.find({})
+        .populate("teams", "name")
+        .lean();
       res.send(tournaments);
     } catch (err) {
       next(err);
@@ -15,7 +14,10 @@ module.exports = {
   getOne: async (req, res, next) => {
     const { _id } = req.params;
     try {
-      const tournament = await Tournaments.findById(_id);
+      const tournament = await Tournaments.findById(_id).populate(
+        "teams",
+        "name"
+      );
       res.send(tournament);
     } catch (err) {
       next(err);
@@ -24,15 +26,16 @@ module.exports = {
   getAllTournamentTeams: async (req, res, next) => {
     const { _id } = req.params; //Del torneo
     try {
-      const teams = await Tournaments.findById(_id).populate("teams");
+      const teams = await Tournaments.findById(_id).populate("teams", "name");
       res.send(teams.teams);
     } catch (err) {
       next(err);
     }
   },
   getOneTournamentTeam: async (req, res, next) => {
+    // PROBANDO
     const { _id, name } = req.params;
-    console.log("=======>",_id, name); 
+    console.log("=======>", _id, name);
     try {
       const team = await Tournaments.findOne({
         _id: _id,
@@ -40,7 +43,7 @@ module.exports = {
           $elemMatch: { name: name },
         },
       }).populate("teams");
-      console.log("=========>",team)
+      console.log("=========>", team);
       res.send(team);
     } catch (err) {
       next(err);
@@ -59,11 +62,13 @@ module.exports = {
   },
   createTournament: async (req, res, next) => {
     try {
-      const { active, beggining, ending, title, details, type } = req.body;
+      const { active, beginning, ending, stage, title, details, type } =
+        req.body;
       const newTournament = new Tournaments({
         active,
-        beggining,
+        beginning,
         ending,
+        stage,
         title,
         details,
         type,
@@ -76,9 +81,8 @@ module.exports = {
   },
   assingTeams: async (req, res, next) => {
     try {
-      const { _id } = req.params; // Del torneo
+      const { _id } = req.params;
       const { team } = req.body;
-
       const tournamentsUpdate = await Tournaments.findByIdAndUpdate(_id, {
         $push: { teams: team },
       });
@@ -87,14 +91,28 @@ module.exports = {
       next(err);
     }
   },
+  bulkCreateATeams: async (req, res, next) => {
+    const id = req.params.id;
+    const { teamsId } = req.body;
+    try {
+      const createdTournament = await Tournaments.findOneAndUpdate(id);
+      const teamIds = teamsId.map((team) => createdTournament.teams.push(team));
+      const savedTournament = await createdTournament.save();
+      res.send(savedTournament);
+    } catch (err) {
+      next(err);
+    }
+  },
   updateOne: async (req, res, next) => {
     const { _id } = req.params;
-    const { active, beggining, ending, title, details, teams, type } = req.body;
+    const { active, beginning, ending, stage, title, details, teams, type } =
+      req.body;
     try {
       const updateTournament = await Tournaments.findOneAndUpdate(_id, {
         active,
-        beggining,
+        beginning,
         ending,
+        stage,
         title,
         details,
         teams,

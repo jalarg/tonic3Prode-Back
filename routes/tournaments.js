@@ -10,37 +10,41 @@ const {
   getAllTournamentTeams,
   getOneTournamentTeam,
   updateOne,
-  searchTournament
+  searchTournament,
+  bulkCreateATeams
 } = require("../controllers/tournaments");
 
-// OBTENER TODOS LOS TORNEOS
-router.get("/", getAll);
+// OBTENER TODOS LOS TORNEOS (FUNCIONA)
+router.get("/", getAll); 
 
-//OBTENER UN TORNEO EN ESPECIFICO
+//OBTENER UN TORNEO EN ESPECIFICO (FUNCIONA)
 router.get("/:_id", getOne);
 
-//OBTENER LOS EQUIPOS DEL TORNEO
+//OBTENER LOS EQUIPOS DEL TORNEO (FUNCIONA)
 router.get("/:_id/teams", getAllTournamentTeams);
 
-//OBTENER UN EQUIPO DEL TORNEO
+//OBTENER UN EQUIPO DE UN TORNEO (NO FUNCIONA)
 router.get("/:_id/:name/team", getOneTournamentTeam);
 
-//BUSCAR UN TORNEO
+//BUSCAR (SEARCH) UN TORNEO (EN PRUEBA)
 router.get("/search/:title", searchTournament);
 
-// AGREGAR UN TORNEO [SEED INICIAL]
-router.post("/", createTournament);
+//BULK CREATE DE TEAMS (FUNCIONA)
+router.put("/:tournamentId/createTeams", bulkCreateATeams)
 
-//AGREGAR TEAMS AL TORNEO
+// AGREGAR UN TORNEO (FUNCIONA)
+router.post("/create", createTournament);
+
+//AGREGAR UN TEAM UN TORNEO (FUNCIONA)
 router.put("/:_id/team", assingTeams);
 
-// MODIFICAR UN TORNEO
+// MODIFICAR UN TORNEO (FUNCIONA)
 router.put("/:_id", updateOne);
 
-// BORRAR UN TORNEO
+// BORRAR UN TORNEO (FUNCIONA)
 router.delete("/:_id", deleteOne);
 
-//BORRAR TODOS LOS TORNEOS
+//BORRAR TODOS LOS TORNEOS (FUNCIONA)
 router.delete("/", deleteAll);
 
 module.exports = router;
