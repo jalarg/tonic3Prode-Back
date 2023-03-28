@@ -18,7 +18,7 @@ router.get("/", getAll);
 // OBTENER UN USUARIO
 router.get("/:username", findOneUser);
 
-// OBTENER TODOS LOS USUARIOS DE UN TORNEO ESPECIFICO
+// OBTENER TODOS LOS USUARIOS DE UN TORNEO ESPECIFICO [TEMA PENDIENTE!!!]
 
 router.get("/tournament/:id", getAllUsersFromOneTournament);
 
@@ -35,5 +35,7 @@ router.delete("/admin", deleteUsers);
 
 // BORRAR A UN USUARIO
 router.delete("/admin/:uid", deleteOneUser);
+
+
 
 module.exports = router;

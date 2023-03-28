@@ -25,9 +25,8 @@ module.exports = {
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
-      const users = await Users.find({ tournaments: tournamentId }).populate(
-        "tournaments"
-      );
+      const users = await Users.find({ tournaments: tournamentId })
+      console.log("El user",users)
       if (!users) {
         return res.status(404).send("Users not found");
       }

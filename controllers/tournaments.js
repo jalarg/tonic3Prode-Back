@@ -104,6 +104,43 @@ module.exports = {
       next(err);
     }
   },
+  addUsertoTournament: async (req, res, next) => {
+    const { _id } = req.params;
+    const { uid } = req.body;
+    try {
+      // Verificar que los datos de entrada sean válidos
+      if (!_id || !uid) {
+        return res.status(400).json({ message: "Invalid input data" });
+      }
+      // check si el torneo existe
+      const tournament = await Tournaments.findById(_id);
+      if (!tournament) {
+        return res.status(404).json({ message: "Tournament not found" });
+      }
+      // check si el user existe
+      const user = await Users.findOne({ uid });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      // check si el usuario ya se registro previamente
+      if (tournament.users.includes(user.id)) {
+        return res
+          .status(400)
+          .json({ message: "User already registered in tournament" });
+      }
+
+      // Agregar el usuario al torneo y guardar los cambios
+      tournament.users.push(user.id);
+      await tournament.save();
+
+      // Responder con los datos actualizados del torneo
+      res.json({ tournament });
+    } catch (error) {
+      // Manejo de errores
+      next(error);
+    }
+  },
+
   updateOne: async (req, res, next) => {
     const { _id } = req.params;
     const {
