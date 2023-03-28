@@ -25,15 +25,15 @@ router.post("/", bulkCreateTeams);
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
 // AGREGAR UN EQUIPO
-router.post("admin/", createOneTeam);
+router.post("/admin/", createOneTeam);
 
-router.put("admin/:id", updateOneTeam);
+router.put("/admin/:id", updateOneTeam);
 
 // BORRAR TODOS LOS EQUIPOS
-router.delete("admin/", deleteTeams);
+router.delete("/admin", deleteTeams);
 
 // BORRAR UN EQUIPO
-router.delete("admin/:id", deleteOneTeam);
+router.delete("/admin/:id", deleteOneTeam);
 
 
 module.exports = router;

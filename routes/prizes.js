@@ -11,15 +11,15 @@ router.get("/", getAll);
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
 // AGREGAR PREMIOS A UN TORNEO
-router.post("admin/addprize", addOnePrize);
+router.post("/admin/addprize", addOnePrize);
 
 // MODIFICAR PREMIOS A UN TORNEO [PENDIENTE]
-router.put("admin/:id", changeOnePrize);
+router.put("/admin/:id", changeOnePrize);
 
 // BORRAR TODOS LOS PREMIOS
 router.delete("/admin", deletePrizes);
 
 // BORRAR UN PREMIO
-router.delete("admin/:id", deleteOnePrize);
+router.delete("/admin/:id", deleteOnePrize);
 
 module.exports = router;

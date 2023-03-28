@@ -45,16 +45,16 @@ router.post("/", createTournament);
 //-----------RUTAS PARA ADMINISTRADORES -------------//
 
 //AGREGAR UN TEAMS AL TORNEO
-router.put("admin/:_id/team", assingTeams);
+router.put("/admin/:_id/team", assingTeams);
 
 // MODIFICAR UN TORNEO
-router.put("admin/:_id", updateOne);
+router.put("/admin/:_id", updateOne);
 
 // BORRAR UN TORNEO
-router.delete("admin/:_id", deleteOne);
+router.delete("/admin/:_id", deleteOne);
 
 //BORRAR TODOS LOS TORNEOS
-router.delete("admin/", deleteAll);
+router.delete("/admin/", deleteAll);
 
 
 module.exports = router;
