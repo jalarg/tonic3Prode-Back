@@ -10,25 +10,32 @@ const {
   getAllTournamentTeams,
   getOneTournamentTeam,
   updateOne,
-  searchTournament
+  searchTournament,
+  bulkCreateATeams
 } = require("../controllers/tournaments");
 
 //-----------RUTAS GENERALES -------------//
 
-// OBTENER TODOS LOS TORNEOS
-router.get("/", getAll);
+// OBTENER TODOS LOS TORNEOS (FUNCIONA)
+router.get("/", getAll); 
 
-//OBTENER UN TORNEO EN ESPECIFICO
+//OBTENER UN TORNEO EN ESPECIFICO (FUNCIONA)
 router.get("/:_id", getOne);
 
-//OBTENER LOS EQUIPOS DEL TORNEO
+//OBTENER LOS EQUIPOS DEL TORNEO (FUNCIONA)
 router.get("/:_id/teams", getAllTournamentTeams);
 
-//OBTENER UN EQUIPO DEL TORNEO
+//OBTENER UN EQUIPO DE UN TORNEO (NO FUNCIONA)
 router.get("/:_id/:name/team", getOneTournamentTeam);
 
-//BUSCAR UN TORNEO
+//BUSCAR (SEARCH) UN TORNEO (EN PRUEBA)
 router.get("/search/:title", searchTournament);
+
+//BULK CREATE DE TEAMS (FUNCIONA)
+router.put("/:tournamentId/createTeams", bulkCreateATeams)
+
+// AGREGAR UN TORNEO (FUNCIONA)
+router.post("/create", createTournament);
 
 //-----------RUTAS PARA SEED RAPIDO -------------//
 
@@ -37,7 +44,7 @@ router.post("/", createTournament);
 
 //-----------RUTAS PARA ADMINISTRADORES -------------//
 
-//AGREGAR TEAMS AL TORNEO
+//AGREGAR UN TEAMS AL TORNEO
 router.put("admin/:_id/team", assingTeams);
 
 // MODIFICAR UN TORNEO
@@ -48,5 +55,6 @@ router.delete("admin/:_id", deleteOne);
 
 //BORRAR TODOS LOS TORNEOS
 router.delete("admin/", deleteAll);
+
 
 module.exports = router;
