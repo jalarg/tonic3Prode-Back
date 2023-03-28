@@ -15,4 +15,13 @@ module.exports = {
         return this[property].toISOString().substring(0, 10);
       });
   },
+  validationUser: (schema, uid, res) => {
+    const user = schema.findOne({ uid });
+
+    if (!user) return res.status(404).send("User not found");
+
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+  }
 };
