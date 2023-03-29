@@ -68,7 +68,7 @@ module.exports = {
 
     const user = await Users.findOne({ uid });
     validationUser(user, res);
-   
+
     try {
       const newTournament = new Tournaments({
         active,
@@ -80,15 +80,13 @@ module.exports = {
         type,
       });
       await newTournament.save();
-      res
-        .status(200)
-        .send(`Tournament: ${newTournament.title} Created Successfully`);
+      res.status(200).send({ newTournament });
     } catch (err) {
       next(err);
     }
   },
   bulkCreateATeams: async (req, res, next) => {
-    const  _id = req.params;
+    const _id = req.params;
     const { teams, uid } = req.body;
 
     const user = await Users.findOne({ uid });
