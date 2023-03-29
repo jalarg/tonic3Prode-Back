@@ -41,7 +41,7 @@ module.exports = {
 
   bulkCreateAGames: async (req, res, next) => {
     const tournamentId = req.params.id;
-    const { stage, details, uid } = req.body; // AGREGAR gamesData que va a venir del front
+    const { matches, uid } = req.body;
     const user = await Users.findOne({ uid });
     if (!user) {
       return res.status(404).send("User not found");
@@ -50,31 +50,35 @@ module.exports = {
       return res.status(403).send("You are not allowed to do this action");
     }
     try {
-      if (!Array.isArray(gamesData) || gamesData.length === 0) {
+      if (!Array.isArray(matches) || matches.length === 0) {
         return res.status(400).send({ error: "Invalid or missing games data" });
       }
 
       const games = [];
 
-      for (let i = 0; i < gamesData.length; i++) {
-        const homeTeam = gamesData[i][0];
-        const awayTeam = gamesData[i][1];
-        const dayOfTheWeek = gamesData[i][2].dayOfTheWeek;
-        const dayOfTheMonth = gamesData[i][2].dayOfTheMonth;
-        const month = gamesData[i][2].month;
-        const hour = gamesData[i][2].hour;
-        const gameIndex = i;
+      for (let i = 0; i < matches.length; i++) {
+        const homeTeam = matches[i].homeTeam;
+        const awayTeam = matches[i].awayTeam;
+        const hour = matches[i].time;
+        const hourMinutes = hour.split(":").join("");
+
+        const gameIndex = i + 1;
+        const dateObj = new Date(matches[i].date);
+        const dayOfTheWeek = dateObj.getDay();
+        const dayOfTheMonth = dateObj.getDate();
+        const month = dateObj.getMonth() + 1;
 
         const newGame = new Games({
           tournaments: tournamentId,
           gameIndex: gameIndex,
-          stage,
-          details,
+          stage: "initial",
+          status: "pending",
+          details: "details of the match",
           teams: [homeTeam, awayTeam],
           dayOfTheWeek: dayOfTheWeek,
           dayOfTheMonth: dayOfTheMonth,
           month: month,
-          hour: hour,
+          hour: hourMinutes,
         });
         games.push(newGame);
         await newGame.save();
