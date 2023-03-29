@@ -29,7 +29,7 @@ router.get("/:_id/teams", getAllTournamentTeams);
 router.get("/:_id/:name/team", getOneTournamentTeam);
 
 //AGREGAR USERS A UN TORNEO
-router.post("/:_id", addUsertoTournament); 
+router.post("/:_id/user", addUsertoTournament); 
 
 //BUSCAR (SEARCH) UN TORNEO (EN PRUEBA)
 router.get("/search/:title", searchTournament);
@@ -39,7 +39,7 @@ router.get("/search/:title", searchTournament);
 
 
 // AGREGAR UN TORNEO 
-router.post("/admin", createTournament);
+router.post("/admin/createTournament", createTournament);
 
 //BULK CREATE DE TEAMS (FUNCIONA)
 router.put("/admin/:_id/createTeams", bulkCreateATeams)

@@ -1,5 +1,5 @@
 const { Tournaments, Users } = require("../db_models");
-
+const { validationUser } = require("../utils/environments");
 
 module.exports = {
   getAll: async (req, res, next) => {
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
   getAllTournamentTeams: async (req, res, next) => {
-    const { _id } = req.params; //Del torneo
+    const { _id } = req.params;
     try {
       const teams = await Tournaments.findById(_id).populate("teams", "name");
       res.send(teams.teams);
@@ -43,7 +43,7 @@ module.exports = {
         teams: {
           $elemMatch: { name: name },
         },
-      }).populate("teams");
+      }).populate("teams", "title");
       console.log("=========>", team);
       res.send(team);
     } catch (err) {
@@ -51,8 +51,9 @@ module.exports = {
     }
   },
   searchTournament: async (req, res, next) => {
+    //PROBRANDO
+    const { title } = req.params;
     try {
-      const { title } = req.params;
       const tournament = await Tournaments.findOne({
         title: { $eq: title },
       }).exec();
@@ -66,10 +67,8 @@ module.exports = {
       req.body;
 
     const user = await Users.findOne({ uid });
-    if (!user) return res.status(404).send("User not found");
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
+   
     try {
       const newTournament = new Tournaments({
         active,
@@ -81,25 +80,25 @@ module.exports = {
         type,
       });
       await newTournament.save();
-      res.send("Creado");
+      res
+        .status(200)
+        .send(`Tournament: ${newTournament.title} Created Successfully`);
     } catch (err) {
       next(err);
     }
   },
   bulkCreateATeams: async (req, res, next) => {
-    const _id = req.params;
-    const { teamsId, uid } = req.body;
+    const  _id = req.params;
+    const { teams, uid } = req.body;
 
     const user = await Users.findOne({ uid });
-    if (!user) return res.status(404).send("User not found");
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
+
     try {
-      const createdTournament = await Tournaments.findOne(_id);
-      const teamIds = teamsId.map((team) => createdTournament.teams.push(team));
+      const createdTournament = await Tournaments.findById(_id);
+      const teamIds = teams.map((team) => createdTournament.teams.push(team));
       const savedTournament = await createdTournament.save();
-      res.send(savedTournament);
+      res.status(201).send(`Teams was updated`);
     } catch (err) {
       next(err);
     }
@@ -156,10 +155,7 @@ module.exports = {
     } = req.body;
 
     const user = await Users.findOne({ uid });
-    if (!user) return res.status(404).send("User not found");
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
 
     try {
       const updateTournament = await Tournaments.findOneAndUpdate(_id, {
@@ -172,7 +168,8 @@ module.exports = {
         teams,
         type,
       });
-      res.send("Tournament was updated");
+      const savedTournament = await updateTournament.save();
+      res.status(201).send("Tournament was updated");
     } catch (err) {
       next(err);
     }
@@ -182,10 +179,8 @@ module.exports = {
     const { uid } = req.body;
 
     const user = await Users.findOne({ uid });
-    if (!user) return res.status(404).send("User not found");
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
+
     try {
       const removed = await Tournaments.findByIdAndDelete(_id);
       res.send(`Deleted from database`);
@@ -195,11 +190,9 @@ module.exports = {
   },
   deleteAll: async (req, res, next) => {
     const { uid } = req.body;
+
     const user = await Users.findOne({ uid });
-    if (!user) return res.status(404).send("User not found");
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
 
     try {
       const removeAll = await Tournaments.deleteMany();
