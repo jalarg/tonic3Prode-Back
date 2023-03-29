@@ -85,7 +85,7 @@ module.exports = {
 
   // SUPERADMIN Y ADMIN PUEDE BORRAR UN USUARIO
   deleteOneUser: async (req, res, next) => {
-    const uidUserToDelete = req.params.id;
+    const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
     if (!user) {
