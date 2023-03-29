@@ -80,7 +80,9 @@ module.exports = {
         type,
       });
       await newTournament.save();
-      res.status(200).send({ newTournament });
+      res
+        .status(200)
+        .send(newTournament._id);
     } catch (err) {
       next(err);
     }
