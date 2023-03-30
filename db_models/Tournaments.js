@@ -25,6 +25,7 @@ const schema = Schema({
   },
   games: [{ type: Schema.Types.ObjectId, ref: "games" }],
   users: [{ type: Schema.Types.ObjectId, ref: "users" }],
+  image_url: { type: String},
 });
 
 //FUNCION PARA AGREGAR FECHA.

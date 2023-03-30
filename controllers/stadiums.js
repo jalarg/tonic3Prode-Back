@@ -5,7 +5,6 @@ module.exports = {
   // RUTAS CON PERMISOS GENERALES
 
   getAll: async (req, res, next) => {
-    console.log(stadiumsArgentina);
     try {
       const stadiums = await Stadiums.find();
       res.send(stadiums);
