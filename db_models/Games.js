@@ -5,7 +5,7 @@
     tournaments: { type: Schema.Types.ObjectId, ref: "tournaments" },
     gameIndex: { type: Number, required: true },
     stage: { type: String, required: true },
-    status: { type: String, required: true },
+    status: { type: String, required: true, default: "pending" },
     hour: { type: Number },
     dayOfTheWeek: { type: Number, required: true },
     dayOfTheMonth: { type: Number, required: true },

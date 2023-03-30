@@ -7,7 +7,7 @@ const schema = Schema({
   beginning: { type: Date, required: true },
   ending: { type: Date, required: true },
   stage: { type: String, enum: ["32", "16", "8", "4", "2"], require: true },
-  title: { type: String, unique: true, required: true },
+  title: { type: String, required: true },
   details: { type: String, required: true },
   teams: [{ type: Schema.Types.ObjectId, ref: "teams" }],
   type: {
