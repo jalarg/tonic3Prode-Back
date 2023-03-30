@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+
 const gameSchema = Schema({
   tournaments: { type: Schema.Types.ObjectId, ref: "tournaments" },
   gameIndex: { type: Number, required: true },
@@ -9,7 +10,7 @@ const gameSchema = Schema({
     enum: ["groups", "initial", "32", "16", "8", "4", "2"],
     require: true,
   },
-  status: { type: String, required: true },
+  status: { type: String, required: true, default: "pending" },
   hour: { type: Number },
   dayOfTheWeek: { type: Number, required: true },
   dayOfTheMonth: { type: Number, required: true },

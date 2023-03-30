@@ -5,6 +5,7 @@ const {
   findOneUser,
   getAllUsersFromOneTournament,
   createOneUser,
+  updateToAdmin,
   createOneAdmin,
   deleteUsers,
   deleteOneUser,
@@ -29,6 +30,10 @@ router.post("/", createOneUser);
 
 // CREAR UN ADMIN
 router.post("/admin", createOneAdmin);
+
+// EDIT ADMIN ROL
+router.put("/admin/role", updateToAdmin);
+
 
 // BORRAR TODOS LOS USUARIOS
 router.delete("/admin", deleteUsers);

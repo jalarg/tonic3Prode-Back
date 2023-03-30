@@ -8,6 +8,7 @@ const gamesData = [
       division: "Liga Profesional",
       foundation: "25 de mayo de 1901",
       origin: "Buenos Aires, Argentina",
+      shortName: "RIV",
     },
     {
       name: "Racing de Córdoba",
@@ -16,6 +17,7 @@ const gamesData = [
       division: "Torneo Federal A",
       foundation: "1924",
       origin: "Córdoba, Argentina",
+      shortName: "RDC",
     },
     {
       dayOfTheWeek: 1,
@@ -32,6 +34,7 @@ const gamesData = [
       division: "Liga Profesional",
       foundation: "12 de octubre de 1913",
       origin: "Córdoba, Argentina",
+      shortName: "TAL",
     },
     {
       name: "Chacarita Juniors",
@@ -40,6 +43,7 @@ const gamesData = [
       division: "Primera Nacional",
       foundation: "1 de mayo de 1906",
       origin: "San Martín, Buenos Aires, Argentina",
+      shortName: "CHA",
     },
     {
       dayOfTheWeek: 2,
@@ -56,6 +60,7 @@ const gamesData = [
       division: "Superliga Argentina",
       foundation: "5 de mayo de 1905",
       origin: "Santa Fe, Argentina",
+      shortName: "COL",
     },
     {
       name: "Colegiales",
@@ -64,6 +69,7 @@ const gamesData = [
       division: "Primera B Metropolitana",
       foundation: "1 de mayo de 1909",
       origin: "Munro, Buenos Aires, Argentina",
+      shortName: "COL",
     },
     {
       dayOfTheWeek: 3,

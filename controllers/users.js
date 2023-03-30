@@ -25,8 +25,8 @@ module.exports = {
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
-      const users = await Users.find({ tournaments: tournamentId })
-      console.log("El user",users)
+      const users = await Users.find({ tournaments: tournamentId });
+      console.log("El user", users);
       if (!users) {
         return res.status(404).send("Users not found");
       }
@@ -66,6 +66,26 @@ module.exports = {
       next(err);
     }
   },
+  updateToAdmin: async (req, res, next) => {
+    const { uid, newAdminUid } = req.body;
+    const user = await Users.findOne({ uid });
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    if (user.rol !== "superAdmin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+    const userToUpdate = await Users.findOneAndUpdate(
+      { uid: newAdminUid },
+      { rol: "admin" },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.send(userToUpdate);
+  },
+
   deleteUsers: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
