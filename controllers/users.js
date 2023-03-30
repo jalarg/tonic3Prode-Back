@@ -108,6 +108,7 @@ module.exports = {
     const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
+    console.log(user)
     if (!user) {
       return res.status(404).send("User not found");
     }
