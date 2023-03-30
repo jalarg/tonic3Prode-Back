@@ -6,7 +6,11 @@ const schema = Schema({
   active: { type: Boolean, required: true },
   beginning: { type: Date, required: true },
   ending: { type: Date, required: true },
-  stage: { type: String, enum: ["32", "16", "8", "4", "2"], require: true },
+  stage: {
+    type: String,
+    enum: ["groups", "initial", "32", "16", "8", "4", "2"],
+    require: true,
+  },
   title: { type: String, required: true },
   details: { type: String, required: true },
   teams: [{ type: Schema.Types.ObjectId, ref: "teams" }],
