@@ -63,8 +63,17 @@ module.exports = {
     }
   },
   createTournament: async (req, res, next) => {
-    const { active, beginning, ending, stage, title, details, type, uid } =
-      req.body;
+    const {
+      active,
+      beginning,
+      ending,
+      stage,
+      title,
+      details,
+      type,
+      uid,
+      image_url,
+    } = req.body;
 
     const user = await Users.findOne({ uid });
     validationUser(user, res);
@@ -78,11 +87,10 @@ module.exports = {
         title,
         details,
         type,
+        image_url,
       });
       await newTournament.save();
-      res
-        .status(200)
-        .send(newTournament._id);
+      res.status(200).send(newTournament._id);
     } catch (err) {
       next(err);
     }
