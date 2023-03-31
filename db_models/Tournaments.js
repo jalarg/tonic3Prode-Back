@@ -25,7 +25,11 @@ const schema = Schema({
   },
   games: [{ type: Schema.Types.ObjectId, ref: "games" }],
   users: [{ type: Schema.Types.ObjectId, ref: "users" }],
-  image_url: { type: String},
+  image_url: {
+    type: String,
+    default:
+      "https://www.frecuenciaalbirroja.com/images/Copa_Argentina_2016.jpg",
+  },
 });
 
 //FUNCION PARA AGREGAR FECHA.

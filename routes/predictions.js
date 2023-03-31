@@ -18,7 +18,7 @@ router.get("/", getAll);
 router.get("/:uid", findUserPredictions);
 
 // AGREGAR VARIAS PREDICCIONES  
-router.post("/:uid", bulkCreatePredictions);
+router.post("/create/:uid", bulkCreatePredictions); 
 
 // MODIFICAR VARIAS PREDICCIONES  
 router.put("/:uid", bulkUpdatePredictions);
