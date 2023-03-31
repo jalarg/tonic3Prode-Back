@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const schema = Schema({
@@ -9,7 +9,7 @@ const schema = Schema({
   status: { type: String, default: "active" },
 });
 
+schema.plugin(require("mongoose-autopopulate"));
+const model = mongoose.model("predictions", schema);
 
-const model = mongoose.model('predictions', schema);
-
-module.exports = model
+module.exports = model;
