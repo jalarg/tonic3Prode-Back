@@ -22,4 +22,25 @@ module.exports = {
       return res.status(403).send("You are not allowed to do this action");
     }
   },
+  gameDate: (schema) => {
+    schema.virtual("date").get(function () {
+      const date = new Date();
+      date.setDate(this.dayOfTheMonth);
+      date.setMonth(this.month - 1);
+      // convert hours and minutes.
+      const hour = (this.hour = Math.floor(hour / 1000));
+      const minute = (hour % 1000) / 10;
+      date.setHours(hour);
+      date.setMinutes(minute);
+
+      return date.toISOString().substring(0, 10);
+    });
+  },
+  fullname: (schema) => {
+    schema.virtual("fullName").get(function () {
+      return `${this.name} ${this.lastName}`;
+    });
+  }
 };
+
+

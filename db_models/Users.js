@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const {fullname} = require("../utils/environments");
 
 const schema = Schema({
   username: { type: String, required: true, unique: true },
@@ -16,21 +17,10 @@ const schema = Schema({
 });
 
 // SET VIRTUAL FULL NAME
-schema.virtual("fullName").get(function () {
-  return `${this.name} ${this.lastName}`;
-});
 
-// SET VIRTUAL TOURNAMENTS
-schema.virtual("tournamentScores").get(function () {
-  let tournaments = {};
-  Object.keys(this.scores).forEach((tournamentId) => {
-    tournaments[tournamentId] = {
-      score: this.scores[tournamentId],
-    };
-  });
-  return tournaments;
-});
+fullname(schema);
 
+schema.plugin(require("mongoose-autopopulate"));
 const model = mongoose.model("users", schema);
 
 module.exports = model;
