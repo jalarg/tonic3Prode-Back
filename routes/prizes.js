@@ -5,7 +5,7 @@ const { getAll, addOnePrize, changeOnePrize, deletePrizes, deleteOnePrize } = re
 //-----------RUTAS GENERALES-------------//
 
 // OBTENER TODOS LOS PREMIOS    
-router.get("/", getAll);
+router.get("/:uid", getAll);
 
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
