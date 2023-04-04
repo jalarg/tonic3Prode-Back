@@ -13,8 +13,9 @@ module.exports = {
   },
 
   getGamesByTournamentId: async (req, res) => {
+    const id = req.params._id;
     try {
-      const games = await Games.find({ tournaments: req.params.id }).populate(
+      const games = await Games.find({ tournaments: id}).populate(
         "tournaments",
         "title"
       );

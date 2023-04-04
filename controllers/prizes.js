@@ -11,7 +11,7 @@ module.exports = {
     }
   },
   addOnePrize: async (req, res, next) => {
-    console.log(req.body)
+    console.log(req.body, "llego esto")
     try {
       const newPrize = new Prizes(req.body);
       const savedPrize = await newPrize.save();

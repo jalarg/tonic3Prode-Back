@@ -19,7 +19,7 @@ const {
 router.get("/", getAll);
 
 // find games by tournament ID
-router.get("/:id", getGamesByTournamentId);
+router.get("/search/:_id", getGamesByTournamentId);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 

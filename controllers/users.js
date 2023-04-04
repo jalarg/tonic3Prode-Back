@@ -12,7 +12,6 @@ module.exports = {
   findOneUser: async (req, res, next) => {
     try {
       const username = req.params.username;
-      console.log(username);
       const user = await Users.findOne({ username });
       if (!user) {
         return res.status(404).send("User not found");
@@ -26,7 +25,6 @@ module.exports = {
     try {
       const tournamentId = req.params.id;
       const users = await Users.find({ tournaments: tournamentId });
-      console.log("El user", users);
       if (!users) {
         return res.status(404).send("Users not found");
       }
@@ -49,7 +47,6 @@ module.exports = {
   // SOLO SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
 
   createOneAdmin: async (req, res, next) => {
-    console.log(req.body);
     const { uid, admin } = req.body;
     const user = await Users.findOne({ uid });
     if (!user) {
@@ -108,7 +105,6 @@ module.exports = {
     const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    console.log(user)
     if (!user) {
       return res.status(404).send("User not found");
     }
