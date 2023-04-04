@@ -34,9 +34,7 @@ module.exports = {
     }
   },
   getOneTournamentTeam: async (req, res, next) => {
-    // PROBANDO
     const { _id, name } = req.params;
-    console.log("=======>", _id, name);
     try {
       const team = await Tournaments.findOne({
         _id: _id,
@@ -44,14 +42,12 @@ module.exports = {
           $elemMatch: { name: name },
         },
       }).populate("teams", "title");
-      console.log("=========>", team);
       res.send(team);
     } catch (err) {
       next(err);
     }
   },
   searchTournament: async (req, res, next) => {
-    //PROBRANDO
     const { title } = req.params;
     try {
       const tournament = await Tournaments.findOne({

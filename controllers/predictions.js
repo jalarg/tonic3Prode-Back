@@ -120,7 +120,6 @@ module.exports = {
   },
 
   deleteOnePrediction: async (req, res, next) => {
-    console.log(req.body);
     try {
       await Predictions.findOneAndDelete({ _id: req.body._id });
       res.send("The prediction was deleted");

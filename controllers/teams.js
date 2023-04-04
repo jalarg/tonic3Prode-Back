@@ -112,7 +112,6 @@ module.exports = {
     }
     try {
       const team = await Teams.findOneAndDelete({ _id: req.params.id });
-      console.log(team);
       res.send("The team selected was deleted");
     } catch (err) {
       next(err);
