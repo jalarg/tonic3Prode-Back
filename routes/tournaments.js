@@ -17,7 +17,7 @@ const {
 //-----------RUTAS GENERALES -------------//
 
 // OBTENER TODOS LOS TORNEOS (FUNCIONA)
-router.get("/", getAll); 
+router.get("/all/:uid", getAll); 
 
 //OBTENER UN TORNEO EN ESPECIFICO (FUNCIONA)
 router.get("/:_id", getOne);
