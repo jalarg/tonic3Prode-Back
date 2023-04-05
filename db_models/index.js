@@ -5,7 +5,6 @@ const Users = require('./Users');
 const Tournaments = require("./Tournaments")
 const Prizes = require('./Prizes');
 const Predictions = require('./Predictions');
-const ActionLog = require("./ActionLog");
 
 module.exports = {
   Teams,
@@ -15,7 +14,6 @@ module.exports = {
   Tournaments,
   Prizes,
   Predictions,
-  ActionLog,
 };  
 
 

@@ -7,7 +7,6 @@ const {
   deleteAll,
   getOne,
   getAllTournamentTeams,
-  getOneTournamentTeam,
   addUsertoTournament,
   updateOne,
   searchTournament,
@@ -16,17 +15,14 @@ const {
 
 //-----------RUTAS GENERALES -------------//
 
-// OBTENER TODOS LOS TORNEOS (FUNCIONA)
+// OBTENER TODOS LOS TORNEOS 
 router.get("/all/:uid", getAll); 
 
-//OBTENER UN TORNEO EN ESPECIFICO (FUNCIONA)
+//OBTENER UN TORNEO EN ESPECIFICO 
 router.get("/:_id", getOne);
 
-//OBTENER LOS EQUIPOS DEL TORNEO (FUNCIONA)
+//OBTENER LOS EQUIPOS DEL TORNEO 
 router.get("/:_id/teams", getAllTournamentTeams);
-
-//OBTENER UN EQUIPO DE UN TORNEO (NO FUNCIONA)
-router.get("/:_id/:name/team", getOneTournamentTeam);
 
 //AGREGAR USERS A UN TORNEO
 router.post("/:_id/user", addUsertoTournament); 
@@ -41,7 +37,7 @@ router.get("/search/:title", searchTournament);
 // AGREGAR UN TORNEO 
 router.post("/admin/createTournament", createTournament);
 
-//BULK CREATE DE TEAMS (FUNCIONA)
+//BULK CREATE DE TEAMS 
 router.put("/admin/:_id/createTeams", bulkCreateATeams)
 
 // MODIFICAR UN TORNEO

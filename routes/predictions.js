@@ -12,7 +12,7 @@ const {
 //-----------RUTAS GENERALES -------------//
 
 // OBTENER TODAS LAS PREDICCIONES  
-router.get("/", getAll);
+router.get("/all/:uid", getAll);
 
 // OBTENER TODAS LAS APUESTAS DE UN USUARIO
 router.get("/:uid", findUserPredictions);
@@ -26,10 +26,10 @@ router.put("/:uid", bulkUpdatePredictions);
 //----- RUTAS SOLO PARA TESTING EN BACK -----//
 
 // BORRAR TODAS LAS PREDICCIONES  
-router.delete("/", deleteAllPredictions);
+router.delete("/admin/delete", deleteAllPredictions);
 
 // BORRAR UNA PREDICCIONES  
-router.delete("/:id", deleteOnePrediction);
+router.delete("/admin/delete/:id", deleteOnePrediction);
 
 module.exports = router;
 
