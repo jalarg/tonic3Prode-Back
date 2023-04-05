@@ -1,55 +1,54 @@
 const { Games, Users } = require("../db_models");
 const gamesData = require("../seed/games");
+const { validationUser } = require("../utils/environments");
+const { createLog } = require("../utils/createLog");
 
 module.exports = {
-  getAll: async (req, res) => {
-    let games;
+  getAll: async (req, res, next) => {
+    const { uid } = req.params;
     try {
-      games = await Games.find({}).populate("tournaments");
-      res.send(games);
-    } catch (error) {
-      res.status(500).send(error);
+      const games = await Games.find({}).populate("tournaments");
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        games,
+        "Se solicitan todos los partidos de la base de datos"
+      );
+    } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
+      next(err);
     }
   },
 
-  getGamesByTournamentId: async (req, res) => {
-    const id = req.params._id;
+  getGamesByTournamentId: async (req, res, next) => {
+    const { _id , uid } = req.params
     try {
-      const games = await Games.find({ tournaments: id}).populate(
+      const games = await Games.find({ tournaments: _id }).populate(
         "tournaments",
         "title"
       );
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        games,
+        "Solicitando todos los partidos de un torneo especifico"
+      );
       res.send(games);
-    } catch (error) {
-      res.status(500).send(error);
+    } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
+      next(err);
     }
   },
-
-  adminCreateAGame: async (req, res) => {
-    const { stage, status, details, result, tournaments } = req.body;
-    const newGame = new Games({
-      tournaments,
-      stage,
-      status,
-      details,
-      result,
-    });
-    await newGame.save();
-    res.send(newGame);
-  },
-
-  // CREATE ALL GAMES OF ONE STAGE
 
   bulkCreateAGames: async (req, res, next) => {
     const tournamentId = req.params.id;
     const { matches, uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
     try {
       if (!Array.isArray(matches) || matches.length === 0) {
         return res.status(400).send({ error: "Invalid or missing games data" });
@@ -84,54 +83,17 @@ module.exports = {
         games.push(newGame);
         await newGame.save();
       }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "POST",
+        req.originalUrl,
+        games,
+        "Creando todos los partidos de un torneo especifico"
+      );
       res.send("Los encuentros se han creado correctamente");
     } catch (err) {
-      next(err);
-    }
-  },
-
-  addOneResult: async (req, res, next) => {
-    const gameId = req.params.id;
-    const { homeTeam, awayTeam, homeTeamScore, awayTeamScore, winner, uid } =
-      req.body;
-    const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
-    try {
-      const result = {
-        homeTeam,
-        awayTeam,
-        homeTeamScore,
-        awayTeamScore,
-        winner,
-      };
-
-      const game = await Games.findOne({ _id: gameId });
-      // Validar que los equipos ingresados existan
-      if (
-        !game.teams[0].name.includes(team1) ||
-        !game.teams[1].name.includes(team2)
-      ) {
-        return res.status(400).send({ error: "Invalid or missing teams" });
-      }
-      //varificar que los resultados sean correctos
-      if (score1 < 0 || score2 < 0) {
-        return res.status(400).send({ error: "Invalid or missing scores" });
-      }
-      if (winner !== team1 && winner !== team2) {
-        return res.status(400).send({ error: "Invalid or missing winner" });
-      }
-      const updatedGame = await Games.findOneAndUpdate(
-        { _id: gameId },
-        { result: result },
-        { new: true }
-      );
-      res.send(updatedGame);
-    } catch (err) {
+      await createLog(uid, "POST", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -139,16 +101,13 @@ module.exports = {
   addManyResults: async (req, res, next) => {
     const results = req.body.results;
     const uid = req.body.uid;
-
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
-
+    validationUser(user, res);
     try {
+
+
+       const gamesUpdated = [];
+
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
         const gameId = result.gameId;
@@ -189,66 +148,84 @@ module.exports = {
           },
           { new: true }
         );
+        gamesUpdated.push(updatedGame);
       }
-
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        gamesUpdated,
+        "Se modifican varios resultados de partidos de un torneo a la vez"
+      );
       res.send("Los resultados se han agregado correctamente");
     } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
 
-  // GENERATE FUTURE GAMES ---- EN PROCESO
-
-  generateFutureGames: async (req, res, next) => {
-    // No encuentro los games de un torneo especifico
-    const tournamentId = req.params.id;
-    const games = await Games.find({
-      tournaments: tournamentId,
-      status: "pending",
-    }); // devuelve array vacio
-    // mapear juegos y buscar ganadores
-    games.map((game) => {
-      // pensar logica
-    });
-    res.send(games);
-    //aguardar ganadores para crear llave siguiente
-
-    // crear juegos de la siguiente llave
-
-    // guardar juegos en la base de datos
-  },
-
-  //---- EN PROCESO
-
-  // RUTA PARA AGREGAR LOS RESULTADOS DE UN PARTIDO
-
   adminEditAGame: async (req, res) => {
-    let game;
+    const { uid } = req.body;
+    const { id } = req.params;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      game = await Games.findOneAndUpdate({ _id: req.params.id }, req.body);
+      const game = await Games.findOneAndUpdate({ _id: id }, req.body);
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        game,
+        "Se modifican varios resultados de partido de un torneo a la vez"
+      );
       res.send(game);
-    } catch (error) {
-      res.status(500).send(error);
+    } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
+      next(err);
     }
   },
 
-  //---- EN PROCESO
-
   adminDeleteAGame: async (req, res) => {
-    let game;
+    const { uid } = req.body;
+    const { id } = req.params;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      game = await Games.deleteOne({ _id: req.params.id });
+      const game = await Games.deleteOne({ _id: id });
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        game,
+        "Se borro un juego de la base de datos"
+      );
       res.send(game);
-    } catch (error) {
-      res.status(500).send(error);
+    } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
+      next(err)
     }
   },
 
   deleteGames: async (req, res, next) => {
+    const { uid } = req.body;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      await Games.deleteMany();
+      const games = await Games.deleteMany();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        games,
+        "Se borraron todos los juegos de la base de datos"
+      );
       res.send("All games were deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },

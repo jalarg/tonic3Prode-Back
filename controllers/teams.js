@@ -1,5 +1,8 @@
 const { Teams, Users } = require("../db_models");
 const { teams } = require("../seed/teams");
+const { validationUser } = require("../utils/environments");
+const { createLog } = require("../utils/createLog");
+
 
 module.exports = {
   // RUTAS DE PEDIDOS PUBLICO GENERAL
@@ -14,10 +17,19 @@ module.exports = {
 
   searchTeam: async (req, res, next) => {
     try {
-      const { name } = req.params;
+      const { name, uid } = req.params;
       const team = await Teams.findOne({ name: { $eq: name } }).exec();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        team,
+        "Se busca un equipo por nombre de la base de datos"
+      );
       res.send(team);
     } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -38,17 +50,21 @@ module.exports = {
   createOneTeam: async (req, res, next) => {
     const { team, uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res) // Validacion de usuario
      try {
-      const newTeam = new Teams(team);
-      const savedTeam = await newTeam.save();
-      res.send(savedTeam);
+       const newTeam = new Teams(team);
+       const savedTeam = await newTeam.save();
+       // registro en caso de exito en log
+       await createLog(
+         uid,
+         "POST",
+         req.originalUrl,
+         savedTeam,
+         "Se creo un nuevo equipo en la base de datos"
+       );
+       res.send(savedTeam);
      } catch (err) {
+       await createLog(uid, "POST", req.originalUrl, err); // registro en caso de error
        next(err);
      }
   },
@@ -57,12 +73,8 @@ module.exports = {
     const teamId = req.params.id;
     const { updates, uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res); // Validacion de usuario
+
     try {
       const allowedUpdates = ["name", "logo_url", "foundation", "origin"];
       const validUpdates = Object.keys(updates).every((update) =>
@@ -77,9 +89,17 @@ module.exports = {
       if (!updatedTeam) {
         return res.status(404).send("Team not found");
       }
-
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        updatedTeam,
+        "Se modifico un equipo de la base de datos"
+      );
       res.send(updatedTeam);
     } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -87,16 +107,20 @@ module.exports = {
   deleteTeams: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res); // Validacion de usuario
     try {
-      await Teams.deleteMany();
+      const teams = await Teams.deleteMany();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        teams,
+        "Se eliminaron todos los torneos de la base de datos"
+      );
       res.send("The teams were deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -104,16 +128,20 @@ module.exports = {
   deleteOneTeam: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res); // Validacion de usuario
     try {
       const team = await Teams.findOneAndDelete({ _id: req.params.id });
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        team,
+        "Se elimino un equipo de la base de datos"
+      );
       res.send("The team selected was deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error  
       next(err);
     }
   },

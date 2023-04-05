@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { getUserLog, deleteLogs } = require("../controllers/actionLog");
+const { getLogs, getUserLog, deleteLogs } = require("../controllers/actionLog");
 
 //-----------RUTAS GENERALES-------------//
 
-// BUSCAR TODOS LOS LOGS
-router.get("/actions/", getUserLog);
+// GET ALL THE LOGS
+router.get("/actions/", getLogs);
 
 // BUSCAR ACCIONES DEL LOG DE UN USUARIO
-router.get("/actions/:user", getUserLog);
+router.get("/actions/:uid", getUserLog);
 
 // DELETE ALL THE LOGS // TESTING ROUTE
 router.delete("/actions/delete", deleteLogs);

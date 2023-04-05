@@ -17,7 +17,7 @@ const {
 router.get("/", getAll);
 
 // BUSCAR UN EQUIPO 
-router.get("/search/:name", searchTeam)
+router.get("/search/:name/:uid", searchTeam)
 
 // CREAR TODOS LOS EQUIPOS [BULK CREATE - SEED INICIAL]
 router.post("/", bulkCreateTeams);

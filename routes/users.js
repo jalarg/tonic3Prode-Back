@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  getAllCheckFB,
   getAll,
   findOneUser,
   getAllUsersFromOneTournament,
@@ -13,8 +14,11 @@ const {
 
 //-----------RUTAS GENERALES-------------//
 
-// OBTENER TODOS LOS USUARIOS
-router.get("/", getAll);
+// OBTENER TODOS LOS USUARIOS CHECK PARA CREAR CUENTA
+router.get("/", getAllCheckFB);
+
+// OBTENER TODOS LOS USUARIOS 
+router.get("/:uid", getAll); 
 
 // OBTENER UN USUARIO
 router.get("/:username", findOneUser);
@@ -28,12 +32,8 @@ router.post("/", createOneUser);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
-// CREAR UN ADMIN
-router.post("/admin", createOneAdmin);
-
 // EDIT ADMIN ROL
 router.put("/admin/role", updateToAdmin);
-
 
 // BORRAR TODOS LOS USUARIOS
 router.delete("/admin", deleteUsers);
