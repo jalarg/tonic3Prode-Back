@@ -1,15 +1,20 @@
 const { Users } = require("../db_models");
-const { createLog }  = require("../utils/createLog");
+const { createLog } = require("../utils/createLog");
 const { validationSuperAdmin } = require("../utils/environments");
 
 module.exports = {
-  
   // RUTAS GENERALES DE PEDIDO GET
   getAllCheckFB: async (req, res, next) => {
     try {
       const users = await Users.find();
       // registro en caso de exito en log
-      await createLog("checkFB","GET",req.originalUrl,users,"Se piden todos los usuarios de la base de datos");
+      await createLog(
+        "checkFB",
+        "GET",
+        req.originalUrl,
+        users,
+        "Se piden todos los usuarios de la base de datos"
+      );
       res.send(users);
     } catch (err) {
       await createLog("checkFB", "GET", req.originalUrl, err); // registro en caso de error
@@ -33,10 +38,13 @@ module.exports = {
       next(err);
     }
   },
+
   findOneUser: async (req, res, next) => {
+    console.log("unooo", req.params.uid);
     try {
-      const { username } = req.body;
-      const user = await Users.findOne({ username });
+      const uid = req.params.uid;
+
+      const user = await Users.findOne({ uid });
       if (!user) {
         return res.status(404).send("User not found");
       }
@@ -65,7 +73,7 @@ module.exports = {
       next(err);
     }
   },
-  
+
   // RUTA DE CREACION DE USUARIOS
   createOneUser: async (req, res, next) => {
     const { uid } = req.body;
@@ -92,28 +100,28 @@ module.exports = {
   // SUPERADMIN PUEDE EDITAR ROL DE USUARIO
   updateToAdmin: async (req, res, next) => {
     const { uid, newAdminUid } = req.body;
-    try{
-    const user = await Users.findOne({ uid });  
-    validationSuperAdmin(user, res);  
-    const userToUpdate = await Users.findOneAndUpdate(
-      { uid: newAdminUid },
-      { rol: "admin" },
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    // registro en caso de exito en log
-    await createLog(
-      uid,
-      "PUT",
-      req.originalUrl,
-      userToUpdate,
-      "Se edita un usuario existente y se lo convierte en admin"
-    ); 
-    res.send(userToUpdate);
+    try {
+      const user = await Users.findOne({ uid });
+      validationSuperAdmin(user, res);
+      const userToUpdate = await Users.findOneAndUpdate(
+        { uid: newAdminUid },
+        { rol: "admin" },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        userToUpdate,
+        "Se edita un usuario existente y se lo convierte en admin"
+      );
+      res.send(userToUpdate);
     } catch (err) {
-      next(err)
+      next(err);
     }
   },
 
@@ -121,7 +129,7 @@ module.exports = {
   deleteUsers: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationSuperAdmin(user, res);  
+    validationSuperAdmin(user, res);
     try {
       await Users.deleteMany();
       // registro en caso de exito en log
@@ -144,7 +152,7 @@ module.exports = {
     const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationSuperAdmin(user, res);  
+    validationSuperAdmin(user, res);
     try {
       const user = await Users.findOneAndDelete({ uid: uidUserToDelete });
       // Check if user exists
@@ -158,7 +166,7 @@ module.exports = {
         req.originalUrl,
         user,
         "Se borra un usuario de la base de datos"
-      ); 
+      );
       res.send("The user was deleted");
     } catch (err) {
       await createLog(req.params.uid, "DELETE", req.originalUrl, err); // registro en caso de error

@@ -17,11 +17,11 @@ const {
 // OBTENER TODOS LOS USUARIOS CHECK PARA CREAR CUENTA
 router.get("/", getAllCheckFB);
 
-// OBTENER TODOS LOS USUARIOS 
-router.get("/:uid", getAll); 
+// OBTENER TODOS LOS USUARIOS
+router.get("/:uid", getAll);
 
 // OBTENER UN USUARIO
-router.get("/:username", findOneUser);
+router.get("/search/:uid", findOneUser);
 
 // OBTENER TODOS LOS USUARIOS DE UN TORNEO ESPECIFICO [TEMA PENDIENTE!!!]
 
@@ -40,7 +40,5 @@ router.delete("/admin", deleteUsers);
 
 // BORRAR A UN USUARIO
 router.delete("/admin/:uid", deleteOneUser);
-
-
 
 module.exports = router;
