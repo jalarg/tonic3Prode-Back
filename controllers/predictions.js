@@ -10,7 +10,7 @@ module.exports = {
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
-      const predictions = await Predictions.find();
+      const predictions = await Predictions.find().populate("games", "tournaments");
       // registro en caso de exito en log
       await createLog(
         uid,
