@@ -149,11 +149,10 @@ module.exports = {
     }
   },
   addUsertoTournament: async (req, res, next) => {
-    const { _id } = req.params;
-    const { uid } = req.body;
+    const { _id, id } = req.params;
     try {
       // Verificar que los datos de entrada sean válidos
-      if (!_id || !uid) {
+      if (!_id || !id) {
         return res.status(400).send({ message: "Invalid input data" });
       }
       // check si el torneo existe
@@ -162,7 +161,7 @@ module.exports = {
         return res.status(404).send({ message: "Tournament not found" });
       }
       // check si el user existe
-      const user = await Users.findOne({ uid });
+      const user = await Users.findOne({ id });
       if (!user) {
         return res.status(404).send({ message: "User not found" });
       }
@@ -179,7 +178,7 @@ module.exports = {
 
       // registro en caso de exito en log
       await createLog(
-        uid,
+        user.uid,
         "PUT",
         req.originalUrl,
         tournament,
