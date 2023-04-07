@@ -23,7 +23,7 @@ const schema = Schema({
     ],
     require: true,
   },
-  games: [{ type: Schema.Types.ObjectId, ref: "games" }],
+  games: [{ type: Schema.Types.ObjectId, ref: "games", default: []}],
   users: [{ type: Schema.Types.ObjectId, ref: "users" }],
   image_url: {
     type: String,

@@ -24,7 +24,7 @@ router.get("/search/:_id/:uid", getGamesByTournamentId);
 router.post("/admin/:id", bulkCreateAGames);
 
 // update many results 
-router.put("/admin", addManyResults);
+router.put("/admin/:id", addManyResults);
 
 //admin edit a game
 router.put("/admin/edit/:id", adminEditAGame);

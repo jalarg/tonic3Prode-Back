@@ -1,4 +1,4 @@
-const { Tournaments, Users } = require("../db_models");
+const { Tournaments, Users, Games, Predictions } = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
 
@@ -241,21 +241,19 @@ module.exports = {
   deleteOne: async (req, res, next) => {
     const { _id } = req.params;
     const { uid } = req.body;
-
     const user = await Users.findOne({ uid });
     validationUser(user, res);
-
     try {
-      const removed = await Tournaments.findByIdAndDelete(_id);
+      const removedTournament = await Tournaments.findByIdAndDelete(_id);
       // registro en caso de exito en log
       await createLog(
         uid,
         "DELETE",
         req.originalUrl,
-        removed,
+        removedTournament,
         "Se elimino el torneo de la base de datos"
       );
-      res.send(`Deleted from database`);
+      res.send(`Tournament deleted from database`);
     } catch (err) {
       await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
@@ -268,17 +266,18 @@ module.exports = {
     validationUser(user, res);
 
     try {
-      const removeAll = await Tournaments.deleteMany();
-
+      const removeAllTournaments = await Tournaments.deleteMany();
       // registro en caso de exito en log
       await createLog(
         uid,
         "DELETE",
         req.originalUrl,
-        removed,
+        removeAllTournaments,
         "Se eliminaron todos los torneos de la base de datos"
       );
+
       res.send(`Deleted from database`);
+
     } catch (err) {
       await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
