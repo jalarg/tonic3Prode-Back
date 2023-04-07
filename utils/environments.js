@@ -22,6 +22,13 @@ module.exports = {
       return res.status(403).send("You are not allowed to do this action");
     }
   },
+  validationSuperAdmin: (user, res) => {
+    if (!user) return res.status(404).send("User not found");
+
+    if (user.rol !== "superAdmin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+  },
   gameDate: (schema) => {
     schema.virtual("date").get(function () {
       const date = new Date();
@@ -40,7 +47,7 @@ module.exports = {
     schema.virtual("fullName").get(function () {
       return `${this.name} ${this.lastName}`;
     });
-  }
+  },
 };
 
 

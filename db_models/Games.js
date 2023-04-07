@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { gameDate } = require("../utils/environments");
 
-const gameSchema = Schema({
+const schema = Schema({
   tournaments: { type: Schema.Types.ObjectId, ref: "tournaments" },
   gameIndex: { type: Number, required: true },
   stage: {
@@ -20,8 +20,8 @@ const gameSchema = Schema({
   result: { type: Array, default: [] },
 });
 
-gameDate(gameSchema);
-gameSchema.plugin(require("mongoose-autopopulate"));
-const model = mongoose.model("Games", gameSchema);
+gameDate(schema);
+schema.plugin(require("mongoose-autopopulate"));
+const model = mongoose.model("games", schema);
 
 module.exports = model;

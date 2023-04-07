@@ -5,16 +5,16 @@ const { getAll, addOnePrize, changeOnePrize, deletePrizes, deleteOnePrize } = re
 //-----------RUTAS GENERALES-------------//
 
 // OBTENER TODOS LOS PREMIOS    
-router.get("/", getAll);
+router.get("/:uid", getAll);
 
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
 // AGREGAR PREMIOS A UN TORNEO
-router.post("/admin/addprize", addOnePrize);
+router.post("/admin/:uid/addprize", addOnePrize);
 
 // MODIFICAR PREMIOS A UN TORNEO [PENDIENTE]
-router.put("/admin/:id", changeOnePrize);
+router.put("/admin/:id/:uid", changeOnePrize);
 
 // BORRAR TODOS LOS PREMIOS
 router.delete("/admin", deletePrizes);

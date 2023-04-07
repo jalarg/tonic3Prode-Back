@@ -1,36 +1,58 @@
 const { Predictions, Users, Teams } = require("../db_models");
+const { validationUser } = require("../utils/environments");
+const { createLog } = require("../utils/createLog");
 
 module.exports = {
-
-  // PERMISO PARA TODOS LOS USUARIOS
+  // GET DE TODAS LAS PREDICCIONES [SOLO PARA ADMINS]
   getAll: async (req, res, next) => {
+    const { uid } = req.params;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      const predictions = await Predictions.find();
+      const predictions = await Predictions.find().populate(
+        "games",
+        "tournaments"
+      );
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        predictions,
+        "Se solicitan todas las predicciones de la base de datos"
+      );
       res.send(predictions);
     } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
 
-  findUserPredictions: async (req, res) => {
+  findUserPredictions: async (req, res, next) => {
+    const { uid } = req.params;
     try {
-      const userUid = req.params.uid;
-      const user = await Users.findOne({ uid: userUid });
-      console.log("el ID",user.id)
-      const predictions = await Predictions.find({ userId: user.id }) 
+      const user = await Users.findOne({ uid: uid });
+      const predictions = await Predictions.find({ userId: user._id })
         .populate("userId", "fullName username email")
+        .populate("gameId", "tournaments")
         .lean();
       if (predictions.length === 0) {
         return res
           .status(404)
           .send({ error: "No predictions were found for this user." });
       }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        predictions,
+        "Usuario solicita sus predicciones de la base de datos"
+      );
       res.send(predictions);
-    } catch (error) {
-      console.error(error);
-      res
-        .status(500)
-        .send({ error: "Error when searching the predictions of this user" });
+    } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
+      next(err);
     }
   },
 
@@ -48,6 +70,7 @@ module.exports = {
       const predictions = [];
       for (const predictionData of predictionsData) {
         const gameId = predictionData.gameId;
+        const status = predictionData.status;
         // Front sends only names and back looks into the DB for the id
         let prediction = predictionData.prediction;
         const homeTeam = await Teams.findOne({ name: prediction.homeTeam });
@@ -57,10 +80,19 @@ module.exports = {
           userId: userToAddPredictions.id,
           gameId: gameId,
           prediction: prediction,
+          status: status,
         });
         predictions.push(newPrediction);
         await newPrediction.save();
       }
+      // registro en caso de exito en log
+      await createLog(
+        userId,
+        "POST",
+        req.originalUrl,
+        predictions,
+        "Se creo una prediccion de un usuario en la base de datos"
+      );
       res.send(
         `${
           predictions.length
@@ -69,6 +101,7 @@ module.exports = {
         )}`
       );
     } catch (err) {
+      await createLog(userId, "POST", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -87,6 +120,7 @@ module.exports = {
       const predictionsToUpdate = [];
       for (const predictionData of predictionsData) {
         const gameId = predictionData.gameId;
+        const status = predictionData.status;
         // Front sends only names and back looks into the DB for the id
         let prediction = predictionData.prediction;
         const homeTeam = await Teams.findOne({ name: prediction.homeTeam });
@@ -98,33 +132,70 @@ module.exports = {
         };
         const update = {
           prediction: prediction,
+          status: status,
         };
         const result = await Predictions.updateMany(updateFilter, update);
         predictionsToUpdate.push(result);
       }
+
+      // registro en caso de exito en log
+      await createLog(
+        userId,
+        "PUT",
+        req.originalUrl,
+        predictionsToUpdate,
+        "Se modificaron las predicciones de un en la base de datos"
+      );
       res.send(`${predictionsToUpdate.length} have been successfully updated.`);
     } catch (err) {
+      await createLog(userId, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
 
-  // RUTAS SOLO PARA TESTING EN BACK
+  // RUTAS ADMIN
 
   deleteAllPredictions: async (req, res, next) => {
+    const { uid } = req.body;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      await Predictions.deleteMany();
+      const predictions = await Predictions.deleteMany();
+
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        predictions,
+        "Se borraron todas las predicciones de un en la base de datos"
+      );
+
       res.send("All predictions were deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
 
   deleteOnePrediction: async (req, res, next) => {
-    console.log(req.body);
+    const { id } = req.params;
+    const { uid } = req.body;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
     try {
-      await Predictions.findOneAndDelete({ _id: req.body._id });
+      const prediction = await Predictions.findOneAndDelete({ _id: id });
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        prediction,
+        "Se borro una prediccion de la base de datos"
+      );
       res.send("The prediction was deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },

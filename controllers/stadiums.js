@@ -1,5 +1,7 @@
 const { Stadiums, Users } = require("../db_models");
 const stadiums = require("../seed/stadiums");
+const { validationUser } = require("../utils/environments");
+const { createLog } = require("../utils/createLog");
 
 module.exports = {
   // RUTAS CON PERMISOS GENERALES
@@ -14,11 +16,20 @@ module.exports = {
   },
 
   searchStadium: async (req, res, next) => {
+    const { name, uid } = req.params;
     try {
-      const { name } = req.params;
-      const team = await Stadiums.findOne({ name: { $eq: name } }).exec();
-      res.send(team);
+      const stadium = await Stadiums.findOne({ name: { $eq: name } }).exec();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "GET",
+        req.originalUrl,
+        stadium,
+        "Se busca un estadio por nombre de la base de datos"
+      );
+      res.send(stadium);
     } catch (err) {
+      await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -39,17 +50,21 @@ module.exports = {
   addOneStadium: async (req, res, next) => {
     const { stadium, uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res)
     try {
       const newStadium = new Stadiums(stadium);
       const savedStadium = await newStadium.save();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "POST",
+        req.originalUrl,
+        savedStadium,
+        "Se busca un estadio por nombre de la base de datos"
+      );
       res.send(savedStadium);
     } catch (err) {
+      await createLog(uid, "POST", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -58,12 +73,7 @@ module.exports = {
     const stadiumId = req.params.id;
     const { updates, uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
     try {
       const allowedUpdates = ["name"];
       const validUpdates = Object.keys(updates).every((update) =>
@@ -82,24 +92,37 @@ module.exports = {
       if (!updatedStadium) {
         return res.status(404).send("Stadium not found");
       }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        updatedStadium,
+        "Se actualizo un estadio de la base de datos"
+      );
       res.send(updatedStadium);
     } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
   deleteStadiums: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
     try {
-      await Stadiums.deleteMany();
+      const stadiums = await Stadiums.deleteMany();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        stadiums,
+        "Se eliminaron todos los estadio de la base de datos"
+      );
       res.send("The stadiums were deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
@@ -107,16 +130,20 @@ module.exports = {
     const id = req.params.id;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    if (user.rol !== "superAdmin" && user.rol !== "admin") {
-      return res.status(403).send("You are not allowed to do this action");
-    }
+    validationUser(user, res);
     try {
-      await Stadiums.findOneAndDelete({ _id: id });
+      const stadium = await Stadiums.findOneAndDelete({ _id: id });
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        stadium,
+        "Se elimino un estadio de la base de datos"
+      );
       res.send("The Stadium selected was deleted");
     } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },

@@ -16,7 +16,7 @@ const {
 router.get("/", getAll);
 
 //SEARCH DE UN ESTADIO POR NOMBRE
-router.get("/search/:name", searchStadium);
+router.get("/search/:name/:uid", searchStadium);
 
 // SUBIR JSON DE ESTADIOS [BULK CREATE - SEED INICIAL]
 router.post("/", bulkCreateStadiums);
