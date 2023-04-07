@@ -11,9 +11,9 @@ module.exports = {
   },
   findOneUser: async (req, res, next) => {
     try {
-      const username = req.params.username;
-      console.log(username);
-      const user = await Users.findOne({ username });
+      const uid = req.params.uid;
+      console.log(uid);
+      const user = await Users.findOne({ uid });
       if (!user) {
         return res.status(404).send("User not found");
       }
@@ -22,6 +22,7 @@ module.exports = {
       next(err);
     }
   },
+
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
@@ -40,6 +41,19 @@ module.exports = {
       const newUser = new Users(req.body);
       const savedUser = await newUser.save();
       res.send(savedUser);
+    } catch (err) {
+      next(err);
+    }
+  },
+  userUpdate: async (req, res, next) => {
+    try {
+      const { cellphone, address } = req.body;
+      const updatedUser = await Users.findOneAndUpdate(
+        { uid: req.params.uid },
+        { cellphone, address },
+        { new: true }
+      );
+      res.send(updatedUser);
     } catch (err) {
       next(err);
     }
@@ -108,7 +122,7 @@ module.exports = {
     const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    console.log(user)
+    console.log(user);
     if (!user) {
       return res.status(404).send("User not found");
     }

@@ -5,6 +5,7 @@ const {
   findOneUser,
   getAllUsersFromOneTournament,
   createOneUser,
+  userUpdate,
   updateToAdmin,
   createOneAdmin,
   deleteUsers,
@@ -17,7 +18,7 @@ const {
 router.get("/", getAll);
 
 // OBTENER UN USUARIO
-router.get("/:username", findOneUser);
+router.get("/:uid", findOneUser);
 
 // OBTENER TODOS LOS USUARIOS DE UN TORNEO ESPECIFICO [TEMA PENDIENTE!!!]
 
@@ -25,6 +26,9 @@ router.get("/tournament/:id", getAllUsersFromOneTournament);
 
 // CREAR UN USUARIO
 router.post("/", createOneUser);
+
+//ACTUALIZAR DATOS USUARIO
+router.put("/update/:uid", userUpdate);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
