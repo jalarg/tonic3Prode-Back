@@ -1,4 +1,4 @@
-const { Games, Users } = require("../db_models");
+const { Games, Users, Tournaments, Teams } = require("../db_models");
 const gamesData = require("../seed/games");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
@@ -16,6 +16,7 @@ module.exports = {
         games,
         "Se solicitan todos los partidos de la base de datos"
       );
+      res.send(games);
     } catch (err) {
       await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
       next(err);
@@ -23,7 +24,7 @@ module.exports = {
   },
 
   getGamesByTournamentId: async (req, res, next) => {
-    const { _id , uid } = req.params
+    const { _id, uid } = req.params;
     try {
       const games = await Games.find({ tournaments: _id }).populate(
         "tournaments",
@@ -83,6 +84,13 @@ module.exports = {
         games.push(newGame);
         await newGame.save();
       }
+      // push games: Actualizar el torneo con los nuevos juegos
+      const updatedTournament = await Tournaments.findOneAndUpdate(
+        { _id: tournamentId },
+        { $push: { games: { $each: games } } },
+        { new: true }
+      );
+
       // registro en caso de exito en log
       await createLog(
         uid,
@@ -99,14 +107,14 @@ module.exports = {
   },
 
   addManyResults: async (req, res, next) => {
+    const { id } = req.params;
     const results = req.body.results;
+    const stage = req.body.stage;
     const uid = req.body.uid;
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
-
-
-       const gamesUpdated = [];
+      const gamesUpdated = [];
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
@@ -158,13 +166,72 @@ module.exports = {
         gamesUpdated,
         "Se modifican varios resultados de partidos de un torneo a la vez"
       );
+
+      // Verificar si se han registrado resultados para todos los juegos de la fase anterior
+      // necesito buscar todos los games de un torneo y filtrar por stage y verificar si el array de resultados tiene resultado
+      const games = await Games.find({ tournaments: id });
+
+      // si la cantidad de resultados es igual a la cantidad de juegos de la fase anterior, entonces se cambia allResultsRegistered a true
+      let allResultsRegistered = false;
+      let count = 0;
+      games.forEach(function (game) {
+        if (game.result.length === 1) {
+          count++;
+          if (count === games.length) {
+            allResultsRegistered = true;
+          }
+        }
+      });
+
+      // si allResultsRegistered es true, entonces se mappean los resultados para obtener los ganadores y se crea una nueva fase
+      if (allResultsRegistered) {
+        // Crear un array para almacenar los objetos de los equipos ganadores
+        const winningTeams = [];
+
+        // Buscar los objetos de los equipos ganadores y agregarlos al array
+        games.forEach(function (game) {
+          if (game.result.length !== 0) {
+            game.result.forEach(function (result) {
+              const winnerName = result.winner;
+              game.teams.forEach(function (team) {
+                if (team.name === winnerName) {
+                  winningTeams.push(team);
+                }
+              });
+            });
+          }
+        });
+
+        // Crear los juegos de la nueva fase
+        for (let i = 0; i < winningTeams.length; i += 2) {
+          let gameIndex = 1;
+          const team1 = winningTeams[i];
+          const team2 = winningTeams[i + 1];
+
+          const newGame = new Games({
+            tournaments: id,
+            gameIndex: gameIndex++,
+            stage: winningTeams.length !== 0 ? winningTeams.length : 0,
+            status: "pending",
+            details: "details of the match",
+            teams: [team1, team2],
+            dayOfTheWeek: 0,
+            dayOfTheMonth: 0,
+            month: 0,
+            hour: 0,
+          });
+          console.log("Juegos creados", newGame);
+
+          games.push(newGame);
+          await newGame.save();
+        }
+      }
       res.send("Los resultados se han agregado correctamente");
     } catch (err) {
       await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
-
   adminEditAGame: async (req, res) => {
     const { uid } = req.body;
     const { id } = req.params;
@@ -205,7 +272,7 @@ module.exports = {
       res.send(game);
     } catch (err) {
       await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
-      next(err)
+      next(err);
     }
   },
 

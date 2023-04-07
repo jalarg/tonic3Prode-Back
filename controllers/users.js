@@ -20,7 +20,7 @@ module.exports = {
       await createLog("checkFB", "GET", req.originalUrl, err); // registro en caso de error
       next(err);
     }
-  },
+  },  
   getAll: async (req, res, next) => {
     const uid = req.params.uid;
     try {

@@ -7,7 +7,6 @@ const {
   getAllUsersFromOneTournament,
   createOneUser,
   updateToAdmin,
-  createOneAdmin,
   deleteUsers,
   deleteOneUser,
 } = require("../controllers/users");
