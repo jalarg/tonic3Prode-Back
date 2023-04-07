@@ -32,6 +32,7 @@ module.exports = {
       const user = await Users.findOne({ uid: uid });
       const predictions = await Predictions.find({ userId: user._id })
         .populate("userId", "fullName username email")
+        .populate("gameId", "tournaments")
         .lean();
       if (predictions.length === 0) {
         return res

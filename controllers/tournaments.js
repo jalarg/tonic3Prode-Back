@@ -174,7 +174,7 @@ module.exports = {
       }
 
       // Agregar el usuario al torneo y guardar los cambios
-      tournament.users.push(user.id);
+      tournament.users.push(user.id); 
       await tournament.save();
 
       // registro en caso de exito en log
@@ -188,7 +188,7 @@ module.exports = {
       // Responder con los datos actualizados del torneo
       res.send({ tournament });
     } catch (error) {
-      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
+      await createLog(uid, "PUT", req.originalUrl, error); // registro en caso de error
       next(error);
     }
   },
