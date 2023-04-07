@@ -3,14 +3,16 @@ const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
 
 module.exports = {
-
   // GET DE TODAS LAS PREDICCIONES [SOLO PARA ADMINS]
   getAll: async (req, res, next) => {
     const { uid } = req.params;
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
-      const predictions = await Predictions.find().populate("games", "tournaments");
+      const predictions = await Predictions.find().populate(
+        "games",
+        "tournaments"
+      );
       // registro en caso de exito en log
       await createLog(
         uid,
@@ -32,6 +34,7 @@ module.exports = {
       const user = await Users.findOne({ uid: uid });
       const predictions = await Predictions.find({ userId: user._id })
         .populate("userId", "fullName username email")
+        .populate("gameId", "tournaments")
         .lean();
       if (predictions.length === 0) {
         return res
@@ -67,6 +70,7 @@ module.exports = {
       const predictions = [];
       for (const predictionData of predictionsData) {
         const gameId = predictionData.gameId;
+        const status = predictionData.status;
         // Front sends only names and back looks into the DB for the id
         let prediction = predictionData.prediction;
         const homeTeam = await Teams.findOne({ name: prediction.homeTeam });
@@ -76,6 +80,7 @@ module.exports = {
           userId: userToAddPredictions.id,
           gameId: gameId,
           prediction: prediction,
+          status: status,
         });
         predictions.push(newPrediction);
         await newPrediction.save();
@@ -115,6 +120,7 @@ module.exports = {
       const predictionsToUpdate = [];
       for (const predictionData of predictionsData) {
         const gameId = predictionData.gameId;
+        const status = predictionData.status;
         // Front sends only names and back looks into the DB for the id
         let prediction = predictionData.prediction;
         const homeTeam = await Teams.findOne({ name: prediction.homeTeam });
@@ -126,6 +132,7 @@ module.exports = {
         };
         const update = {
           prediction: prediction,
+          status: status,
         };
         const result = await Predictions.updateMany(updateFilter, update);
         predictionsToUpdate.push(result);
