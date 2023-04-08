@@ -17,7 +17,19 @@ const schema = Schema({
   month: { type: Number, required: true },
   details: { type: String },
   teams: { type: Array, required: true },
-  result: { type: Array, default: [] },
+  result: {
+    type: Object,
+    default: 
+     { HomeTeamScore: null,
+      AwayTeamScore: null,
+      HomeTeamPenalties: null,
+      AwayTeamPenalties: null,
+      Winner: null,
+      WinningTeam: null,
+      WinningType: null,
+      stage: null
+    },
+  },
 });
 
 gameDate(schema);
