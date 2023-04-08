@@ -58,6 +58,7 @@ module.exports = {
       const games = [];
 
       for (let i = 0; i < matches.length; i++) {
+        const stage = matches[i].stage;
         const homeTeam = matches[i].homeTeam;
         const awayTeam = matches[i].awayTeam;
         const hour = matches[i].time;
@@ -72,7 +73,7 @@ module.exports = {
         const newGame = new Games({
           tournaments: tournamentId,
           gameIndex: gameIndex,
-          stage: "initial",
+          stage: stage,
           status: "pending",
           details: "details of the match",
           teams: [homeTeam, awayTeam],
@@ -108,9 +109,9 @@ module.exports = {
 
   addManyResults: async (req, res, next) => {
     const { id } = req.params;
-    const results = req.body.results;
-    const stage = req.body.stage;
+    const results = req.body.myData;
     const uid = req.body.uid;
+    console.log(results)
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
@@ -118,30 +119,35 @@ module.exports = {
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
-        const gameId = result.gameId;
-        const homeTeam = result.homeTeam;
-        const awayTeam = result.awayTeam;
+        const gameId = result._id;
+        const homeTeam = result.teams[0].name;
+        const awayTeam = result.teams[1].name;
         const homeTeamScore = result.homeTeamScore;
+        const homeTeamPenalties = result.homeTeamPenalties;
         const awayTeamScore = result.awayTeamScore;
+        const awayTeamPenalties = result.AwayTeamPenalties;
         const winner = result.winner;
+        const winningType = result.WinningType;
+
+    
 
         const game = await Games.findOne({ _id: gameId });
 
         // Validar que los equipos ingresados existan
-        if (
-          !game.teams[0].name.includes(homeTeam) ||
-          !game.teams[1].name.includes(awayTeam)
-        ) {
-          return res.status(400).send({ error: "Invalid or missing teams" });
-        }
+        // if (
+        //   !game.teams[0].name.includes(homeTeam) ||
+        //   !game.teams[1].name.includes(awayTeam)
+        // ) {
+        //   return res.status(400).send({ error: "Invalid or missing teams" });
+        // }
 
-        // Validar que los resultados sean correctos
-        if (homeTeamScore < 0 || awayTeamScore < 0) {
-          return res.status(400).send({ error: "Invalid or missing scores" });
-        }
-        if (winner !== homeTeam && winner !== awayTeam) {
-          return res.status(400).send({ error: "Invalid or missing winner" });
-        }
+        // // Validar que los resultados sean correctos
+        // if (homeTeamScore < 0 || awayTeamScore < 0) {
+        //   return res.status(400).send({ error: "Invalid or missing scores" });
+        // }
+        // if (winner !== homeTeam && winner !== awayTeam) {
+        //   return res.status(400).send({ error: "Invalid or missing winner" });
+        // }
 
         const updatedGame = await Games.findOneAndUpdate(
           { _id: gameId },
@@ -151,7 +157,11 @@ module.exports = {
               awayTeam,
               homeTeamScore,
               awayTeamScore,
+              homeTeamPenalties,
+              awayTeamPenalties,
               winner,
+              winningType,
+              status: "closed",
             },
           },
           { new: true }

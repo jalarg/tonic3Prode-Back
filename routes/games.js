@@ -27,7 +27,7 @@ router.post("/admin/:id", bulkCreateAGames);
 router.put("/admin/:id", addManyResults);
 
 //admin edit a game
-router.put("/admin/edit/:id", adminEditAGame);
+router.put("/admin/addresults/:id", adminEditAGame);
 
 //admin delete a game
 router.delete("/admin/delete/:id", adminDeleteAGame); 
