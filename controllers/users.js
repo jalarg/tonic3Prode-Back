@@ -40,7 +40,7 @@ module.exports = {
   },
 
   findOneUser: async (req, res, next) => {
-    console.log("unooo", req.params.uid);
+
     try {
       const uid = req.params.uid;
 
@@ -61,6 +61,7 @@ module.exports = {
       next(err);
     }
   },
+  
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
