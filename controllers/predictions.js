@@ -76,6 +76,14 @@ module.exports = {
         const homeTeam = await Teams.findOne({ name: prediction.homeTeam });
         const awayTeam = await Teams.findOne({ name: prediction.awayTeam });
         prediction = { ...prediction, homeTeam: homeTeam, awayTeam: awayTeam };
+        // Verificar si la predicción ya existe para este usuario y juego
+        const existingPrediction = await Predictions.findOne({
+          userId: userToAddPredictions.id,
+          gameId: gameId,
+        });
+        if (existingPrediction) {
+          continue; // Saltar a la siguiente iteración del bucle si la predicción ya existe
+        }
         const newPrediction = new Predictions({
           userId: userToAddPredictions.id,
           gameId: gameId,
@@ -131,7 +139,10 @@ module.exports = {
           gameId: gameId,
         };
         const update = {
-          prediction: prediction,
+          $set: {
+            "prediction.homeTeamScore": predictionData.prediction.homeTeamScore,
+            "prediction.awayTeamScore": predictionData.prediction.awayTeamScore,
+          },
           status: status,
         };
         const result = await Predictions.updateMany(updateFilter, update);
