@@ -17,6 +17,11 @@ const schema = Schema({
   month: { type: Number, required: true },
   details: { type: String },
   teams: { type: Array, required: true },
+  stage: {
+    type: String,
+    enum: ["groups", "initial", "32", "16", "8", "4", "2"],
+    require: true,
+  },
   result: {
     type: Object,
     default: {
