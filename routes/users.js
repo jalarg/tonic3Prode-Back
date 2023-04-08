@@ -9,6 +9,7 @@ const {
   updateToAdmin,
   deleteUsers,
   deleteOneUser,
+  userUpdate
 } = require("../controllers/users");
 
 //-----------RUTAS GENERALES-------------//
