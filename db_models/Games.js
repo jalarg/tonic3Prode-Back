@@ -19,15 +19,15 @@ const schema = Schema({
   teams: { type: Array, required: true },
   result: {
     type: Object,
-    default: 
-     { HomeTeamScore: null,
-      AwayTeamScore: null,
-      HomeTeamPenalties: null,
-      AwayTeamPenalties: null,
-      Winner: null,
-      WinningTeam: null,
-      WinningType: null,
-      stage: null
+    default: {
+      HomeTeamScore: "",
+      AwayTeamScore: "",
+      HomeTeamPenalties: "",
+      AwayTeamPenalties: "",
+      Winner: "",
+      WinningTeam: "",
+      WinningType: "",
+      stage: "",
     },
   },
 });

@@ -132,7 +132,7 @@ module.exports = {
     
 
         const game = await Games.findOne({ _id: gameId });
-
+        const newstatus = (game.result.homeTeam) === "pending" ? "closed" : "pending"
         // Validar que los equipos ingresados existan
         // if (
         //   !game.teams[0].name.includes(homeTeam) ||
@@ -149,9 +149,11 @@ module.exports = {
         //   return res.status(400).send({ error: "Invalid or missing winner" });
         // }
 
+
         const updatedGame = await Games.findOneAndUpdate(
           { _id: gameId },
           {
+            status: newstatus,
             result: {
               homeTeam,
               awayTeam,
@@ -161,7 +163,6 @@ module.exports = {
               awayTeamPenalties,
               winner,
               winningType,
-              status: "closed",
             },
           },
           { new: true }
