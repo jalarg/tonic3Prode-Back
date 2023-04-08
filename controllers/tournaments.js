@@ -149,10 +149,14 @@ module.exports = {
     }
   },
   addUsertoTournament: async (req, res, next) => {
-    const { _id, id } = req.params;
+    const { _id } = req.params;
+    const userUid = req.body.userUid;
+    const userId = req.body.userId;
+
+    console.log(req.body);
     try {
       // Verificar que los datos de entrada sean válidos
-      if (!_id || !id) {
+      if (!_id || !userId) {
         return res.status(400).send({ message: "Invalid input data" });
       }
       // check si el torneo existe
@@ -161,24 +165,25 @@ module.exports = {
         return res.status(404).send({ message: "Tournament not found" });
       }
       // check si el user existe
-      const user = await Users.findOne({ id });
+      const user = await Users.findOne({ _id: userId });
       if (!user) {
         return res.status(404).send({ message: "User not found" });
       }
       // check si el usuario ya se registro previamente
-      if (tournament.users.includes(user.id)) {
+      console.log(user._id, "ESTE ES EL USER POSTA")
+      if (tournament.users.includes(user._id)) {
         return res
           .status(400)
           .send({ message: "User already registered in tournament" });
       }
 
       // Agregar el usuario al torneo y guardar los cambios
-      tournament.users.push(user.id); 
+      tournament.users.push(user._id); 
       await tournament.save();
 
       // registro en caso de exito en log
       await createLog(
-        user.uid,
+        userUid,
         "PUT",
         req.originalUrl,
         tournament,

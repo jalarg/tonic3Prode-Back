@@ -25,7 +25,7 @@ router.get("/:_id", getOne);
 router.get("/:_id/teams", getAllTournamentTeams);
 
 //AGREGAR USERS A UN TORNEO
-router.put("/:_id/:_id", addUsertoTournament); 
+router.put("/:_id/addme", addUsertoTournament); 
 
 //BUSCAR (SEARCH) UN TORNEO (EN PRUEBA)
 router.get("/search/:title", searchTournament);
