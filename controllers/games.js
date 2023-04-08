@@ -125,9 +125,9 @@ module.exports = {
         const homeTeamScore = result.homeTeamScore;
         const homeTeamPenalties = result.homeTeamPenalties;
         const awayTeamScore = result.awayTeamScore;
-        const awayTeamPenalties = result.AwayTeamPenalties;
-        const winner = result.winner;
-        const winningType = result.WinningType;
+        const awayTeamPenalties = result.awayTeamPenalties;
+        const winningTeam = result.winningTeam;
+        const winningType = result.winningType;
 
     
 
@@ -161,7 +161,7 @@ module.exports = {
               awayTeamScore,
               homeTeamPenalties,
               awayTeamPenalties,
-              winner,
+              winningTeam,
               winningType,
             },
           },
