@@ -126,6 +126,21 @@ module.exports = {
     }
   },
 
+  userUpdate: async (req, res, next) => {
+    try {
+      const { cellphone, address } = req.body;
+      const updatedUser = await Users.findOneAndUpdate(
+        { uid: req.params.uid },
+        { cellphone, address },
+        { new: true }
+      );
+      res.send(updatedUser);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+
   // SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
   deleteUsers: async (req, res, next) => {
     const { uid } = req.body;

@@ -9,6 +9,7 @@ const {
   updateToAdmin,
   deleteUsers,
   deleteOneUser,
+  userUpdate
 } = require("../controllers/users");
 
 //-----------RUTAS GENERALES-------------//
@@ -28,6 +29,9 @@ router.get("/tournament/:id", getAllUsersFromOneTournament);
 
 // CREAR UN USUARIO
 router.post("/", createOneUser);
+
+//ACTUALIZAR DATOS USUARIO
+router.put("/update/:uid", userUpdate);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
