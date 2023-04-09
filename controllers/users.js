@@ -1,6 +1,7 @@
 const { Users } = require("../db_models");
 const { createLog } = require("../utils/createLog");
 const { validationSuperAdmin } = require("../utils/environments");
+const emailVerification = require("../utils/mailer");
 
 module.exports = {
   // RUTAS GENERALES DE PEDIDO GET
@@ -20,7 +21,7 @@ module.exports = {
       await createLog("checkFB", "GET", req.originalUrl, err); // registro en caso de error
       next(err);
     }
-  },  
+  },
   getAll: async (req, res, next) => {
     const uid = req.params.uid;
     try {
@@ -40,7 +41,6 @@ module.exports = {
   },
 
   findOneUser: async (req, res, next) => {
-
     try {
       const uid = req.params.uid;
 
@@ -61,7 +61,7 @@ module.exports = {
       next(err);
     }
   },
-  
+
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
@@ -81,6 +81,10 @@ module.exports = {
     try {
       const newUser = new Users(req.body);
       const savedUser = await newUser.save();
+      // Enlace de verificación de email
+      const verificationLink = `http://localhost:3001/verify-email?token=${uid}`;
+      // Envío de email de verificación
+      emailVerification(verificationLink, savedUser.email);
       // registro en caso de exito en log
       await createLog(
         uid,
@@ -92,6 +96,37 @@ module.exports = {
       res.send(savedUser);
     } catch (err) {
       await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
+  // RUTA DE VERIFICACION DE EMAIL----------------------------- PENDIENTE DE REVISAR
+  verifyEmail: async (req, res, next) => {
+    const { token } = req.query;
+    try {
+      const user = await Users.findOneAndUpdate(
+        { uid: token },
+        { isVerified: true },
+        { new: true }
+      );
+
+      if (!user) {
+        throw new Error("Token no válido");
+      }
+
+      // Registro en caso de éxito en log
+      await createLog(
+        token,
+        "GET",
+        req.originalUrl,
+        user,
+        "Se actualiza el estado del usuario a verificado"
+      );
+
+      res.send("Tu correo ha sido verificado exitosamente.");
+    } catch (err) {
+      // Registro en caso de error en log
+      await createLog(token, "GET", req.originalUrl, err);
       next(err);
     }
   },
@@ -139,7 +174,6 @@ module.exports = {
       next(err);
     }
   },
-
 
   // SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
   deleteUsers: async (req, res, next) => {

@@ -14,6 +14,7 @@ const schema = Schema({
   cellphone: { type: String },
   tournaments: [{ type: Schema.Types.ObjectId, ref: "tournaments" }],
   scores: { type: Object, default: {} },
+  isVerified: { type: Boolean, default: false },
 });
 
 // SET VIRTUAL FULL NAME
