@@ -191,14 +191,22 @@ module.exports = {
       let allResultsRegistered = false;
       let count = 0;
       games.forEach(function (game) {
-        if (game.status === "closed" && game.stage === results.length) {
+        console.log(results.length, "largo de resultados")
+        console.log(game.stage, "stage del juego")
+        console.log(game.status, "status del juego")
+        console.log(parseInt(game.stage) === results.length, "stage del juego es igual al largo de resultados");
+        if (game.status === "closed" && parseInt(game.stage) === results.length) {
+            console.log("count:", count);
           count++;
           if (count === games.length) {
+            console.log("count:", count);
+            console.log("PASE ACA")
             allResultsRegistered = true;
           }
-        }
+        } 
       });
 
+      console.log("allResultsRegistered:", allResultsRegistered);
       // si allResultsRegistered es true, entonces se mappean los resultados para obtener los ganadores y se crea una nueva fase
       if (allResultsRegistered) {
         // Crear un array para almacenar los objetos de los equipos ganadores
@@ -210,7 +218,9 @@ module.exports = {
           console.log("Winners:", winners)
           winningTeams.push(winners);
         }
-
+        if( winningTeams.length === 1) {
+        return res.send("El torneo ha finalizado")
+        }
         let gameIndex = 1;
         // Crear los juegos de la nueva fase
         for (let i = 0; i < winningTeams.length; i += 2) {      
@@ -221,11 +231,11 @@ module.exports = {
 
          const newStage =
            winningTeams.length === 16
-             ? "16"
-             : winningTeams.length === 8
              ? "8"
-             : winningTeams.length === 4
+             : winningTeams.length === 8
              ? "4"
+             : winningTeams.length === 4
+             ? "2"
              : winningTeams.length === 2
              ? "final"
              : ""

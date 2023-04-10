@@ -19,7 +19,7 @@ const schema = Schema({
   teams: { type: Array, required: true },
   stage: {
     type: String,
-    enum: ["groups", "initial", "32", "16", "8", "4", "2"],
+    enum: ["groups", "initial", "32", "16", "8", "4", "2", "final"],
     require: true,
   },
   result: {
