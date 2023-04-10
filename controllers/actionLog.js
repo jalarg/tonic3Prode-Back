@@ -47,18 +47,3 @@ module.exports = {
 };
 
 
-
-
-    // try {
-    //   fs.readFile(route, "utf8", (err, data) => {
-    //     if (err) throw err;
-    //     const logs = data.split("\n").map((log) => JSON.parse(log));
-    //     const filteredLogs = req.query.user
-    //       ? logs.filter((log) => log.user === req.query.user)
-    //       : logs;
-    //     res.status(200).send(filteredLogs);
-    //   });
-    // } catch (err) {
-    //   console.error(err);
-    //   res.status(500).send("Error retrieving logs");
-    // }

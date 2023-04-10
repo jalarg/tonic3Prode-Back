@@ -106,63 +106,68 @@ module.exports = {
       next(err);
     }
   },
-
   addManyResults: async (req, res, next) => {
     const { id } = req.params;
     const results = req.body.myData;
     const uid = req.body.uid;
-    console.log(results)
+    console.log(results);
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
       const gamesUpdated = [];
 
       for (let i = 0; i < results.length; i++) {
-        const result = results[i];
-        const gameId = result._id;
-        const homeTeam = result.teams[0].name;
-        const awayTeam = result.teams[1].name;
-        const homeTeamScore = result.homeTeamScore;
-        const homeTeamPenalties = result.homeTeamPenalties;
-        const awayTeamScore = result.awayTeamScore;
-        const awayTeamPenalties = result.awayTeamPenalties;
-        const winningTeam = result.winningTeam;
-        const winningType = result.winningType;
+ 
+        const gameToUpdate = results[i];
+        const gameId = gameToUpdate._id;
+        const stage = results.length
+        const homeTeam = gameToUpdate.teams[0].name;
+        const awayTeam = gameToUpdate.teams[1].name;
+        const homeTeamScore = gameToUpdate.result.homeTeamScore;
+        const homeTeamPenalties = gameToUpdate.result.homeTeamPenalties;
+        const awayTeamScore = gameToUpdate.result.awayTeamScore;
+        const awayTeamPenalties = gameToUpdate.result.awayTeamPenalties;
+        const winningType = gameToUpdate.result.winningType;
+        let winningTeam = "";
+        
 
-    
+        if (winningType === "regular") {
+          if (homeTeamScore > awayTeamScore) {
+            winningTeam = homeTeam;
+          } else {
+            winningTeam = awayTeam;
+          }
+          console.log("Winning team (regular):", winningTeam);
+        } else if (winningType === "penalties") {
+          if (
+            homeTeamScore + homeTeamPenalties >
+            awayTeamScore + awayTeamPenalties
+          ) {
+            winningTeam = homeTeam;
+          } else {
+            winningTeam = awayTeam;
+          }
+          console.log("Winning team (penalties):", winningTeam);
+        }
 
-        const game = await Games.findOne({ _id: gameId });
-        const newstatus = (game.result.homeTeam) === "pending" ? "closed" : "pending"
-        // Validar que los equipos ingresados existan
-        // if (
-        //   !game.teams[0].name.includes(homeTeam) ||
-        //   !game.teams[1].name.includes(awayTeam)
-        // ) {
-        //   return res.status(400).send({ error: "Invalid or missing teams" });
-        // }
-
-        // // Validar que los resultados sean correctos
-        // if (homeTeamScore < 0 || awayTeamScore < 0) {
-        //   return res.status(400).send({ error: "Invalid or missing scores" });
-        // }
-        // if (winner !== homeTeam && winner !== awayTeam) {
-        //   return res.status(400).send({ error: "Invalid or missing winner" });
-        // }
-
+        const newstatus = gameToUpdate.result.homeTeamScore
+          ? "closed"
+          : "pending";
 
         const updatedGame = await Games.findOneAndUpdate(
           { _id: gameId },
           {
+            stage: stage,
             status: newstatus,
             result: {
-              homeTeam,
-              awayTeam,
-              homeTeamScore,
-              awayTeamScore,
-              homeTeamPenalties,
-              awayTeamPenalties,
-              winningTeam,
-              winningType,
+              homeTeam: homeTeam ? homeTeam : "",
+              awayTeam: awayTeam ? awayTeam : "",
+              homeTeamScore: homeTeamScore ? homeTeamScore : "",
+              awayTeamScore: awayTeamScore ? awayTeamScore : "",
+              homeTeamPenalties: homeTeamPenalties ? homeTeamPenalties : "",
+              awayTeamPenalties: awayTeamPenalties ? awayTeamPenalties : "",
+              winningTeam: winningTeam ? winningTeam : "",
+              winningType: winningType ? winningType : "",
             },
           },
           { new: true }
@@ -186,7 +191,7 @@ module.exports = {
       let allResultsRegistered = false;
       let count = 0;
       games.forEach(function (game) {
-        if (game.result.length === 1) {
+        if (game.status === "closed" && game.stage === results.length) {
           count++;
           if (count === games.length) {
             allResultsRegistered = true;
@@ -198,31 +203,37 @@ module.exports = {
       if (allResultsRegistered) {
         // Crear un array para almacenar los objetos de los equipos ganadores
         const winningTeams = [];
-
         // Buscar los objetos de los equipos ganadores y agregarlos al array
-        games.forEach(function (game) {
-          if (game.result.length !== 0) {
-            game.result.forEach(function (result) {
-              const winnerName = result.winner;
-              game.teams.forEach(function (team) {
-                if (team.name === winnerName) {
-                  winningTeams.push(team);
-                }
-              });
-            });
-          }
-        });
+        for (const game of games) {
+          console.log("decime que es esto:",game.result.winningTeam);
+          const winners = await Teams.find({ name: game.result.winningTeam });
+          console.log("Winners:", winners)
+          winningTeams.push(winners);
+        }
 
+        let gameIndex = 1;
         // Crear los juegos de la nueva fase
-        for (let i = 0; i < winningTeams.length; i += 2) {
-          let gameIndex = 1;
+        for (let i = 0; i < winningTeams.length; i += 2) {      
           const team1 = winningTeams[i];
           const team2 = winningTeams[i + 1];
+          console.log("team1:", team1)
+          console.log("team2:", team2)
+
+         const newStage =
+           winningTeams.length === 16
+             ? "16"
+             : winningTeams.length === 8
+             ? "8"
+             : winningTeams.length === 4
+             ? "4"
+             : winningTeams.length === 2
+             ? "final"
+             : ""
 
           const newGame = new Games({
             tournaments: id,
             gameIndex: gameIndex++,
-            stage: winningTeams.length !== 0 ? winningTeams.length : 0,
+            stage: newStage,
             status: "pending",
             details: "details of the match",
             teams: [team1, team2],
@@ -243,6 +254,7 @@ module.exports = {
       next(err);
     }
   },
+
   adminEditAGame: async (req, res) => {
     const { uid } = req.body;
     const { id } = req.params;
