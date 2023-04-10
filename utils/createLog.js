@@ -7,10 +7,10 @@ async function createLog(uid, method, route, info, description) {
     user: uid || null,
     method,
     route,
-    data: null,
+    data: info,
     description: description || null,
   };
-  // console.log(logData);
+  console.log(logData);
 
   const filePath = path.join(__dirname, "logs.txt"); // [1] define la ruta y el nombre del archivo
   const logText = JSON.stringify(logData); // [2] convierte el objeto en texto
