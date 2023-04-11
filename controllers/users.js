@@ -163,10 +163,11 @@ module.exports = {
 
   userUpdate: async (req, res, next) => {
     try {
-      const { cellphone, address } = req.body;
+      const { username, cellphone, address } = req.body;
       const updatedUser = await Users.findOneAndUpdate(
+     
         { uid: req.params.uid },
-        { cellphone, address },
+        { username, cellphone, address },
         { new: true }
       );
       res.send(updatedUser);
