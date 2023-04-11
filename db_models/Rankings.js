@@ -11,6 +11,7 @@ const schema = Schema({
   position: { type: Number, required: true },
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   score: { type: Number, required: true },
+  timestamp: { type: Date, default: Date.now },
 });
 
 schema.index({ tournamentId: 1, country: 1, position: 1 }, { unique: true });
@@ -18,5 +19,4 @@ schema.index({ tournamentId: 1, country: 1, position: 1 }, { unique: true });
 const model = mongoose.model("ranking", schema);
 
 module.exports = model
-
 

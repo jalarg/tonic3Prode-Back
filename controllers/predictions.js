@@ -9,10 +9,11 @@ module.exports = {
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
-      const predictions = await Predictions.find().populate(
-        "games",
-        "tournaments"
-      );
+      const predictions = await Predictions.find()
+      .populate("userId", "name email")
+      .populate("gameId", "details teams")
+      .exec();
+
       // registro en caso de exito en log
       await createLog(
         uid,
