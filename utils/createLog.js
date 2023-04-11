@@ -7,7 +7,7 @@ async function createLog(uid, method, route, info, description) {
     user: uid || null,
     method,
     route,
-    data: info,
+    data: null,
     description: description || null,
   };
   console.log(logData);
