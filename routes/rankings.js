@@ -2,14 +2,17 @@ const express = require("express");
 const router = express.Router();
 const {
   getAll,
+  registerUserToTournament,
   deleteAllPositions,
   deleteOnePosition,
 } = require("../controllers/rankings");
 
 //-----------RUTAS GENERALES-------------//
 
-// OBTENER TODOS LOS PREMIOS
-router.get("/:uid", getAll);
+// OBTENER TODOS LOS RANKINGS
+router.get("/search/:tournamentId/:uid", getAll);
+
+router.post("/register/:TournamentId/:uid", registerUserToTournament);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
