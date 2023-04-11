@@ -1,3 +1,4 @@
+
 module.exports = {
   validateRequiredEnvs: (requiredEnvs) => {
     for (const requiredEnv of requiredEnvs) {
@@ -48,6 +49,36 @@ module.exports = {
       return `${this.name} ${this.lastName}`;
     });
   },
+  addPointsToUser: async (userId, pointsToAdd) => {
+    try {
+      const ranking = await Rankings.findOne({ userId });
+      if (ranking) {
+        ranking.score += pointsToAdd;
+        await ranking.save();
+        return ranking;
+      }
+      return null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  },
+  calculatePointsToAdd: (
+    userWinner,
+    matchWinner,
+    userHomeTeamScore,
+    userAwayTeamScore,
+    matchHomeTeamScore,
+    awayHomeTeamScore
+  ) => {
+    switch (true) {
+      case userWinner === matchWinner:
+        return 1;
+      case userHomeTeamScore === matchHomeTeamScore &&
+        userAwayTeamScore === matchAwayTeamScore:
+        return 3;
+      default:
+        return 0;
+    }
+  },
 };
-
-

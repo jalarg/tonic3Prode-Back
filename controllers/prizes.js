@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const { Prizes, Users } = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");

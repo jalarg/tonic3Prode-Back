@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const { Rankings, Users } = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
@@ -80,7 +79,6 @@ module.exports = {
       });
     }
   },
-
   // RUTA DE PERMISOS DE ADMINISTRADOR
   deleteAllPositions: async (req, res, next) => {
     const { uid } = req.body;
