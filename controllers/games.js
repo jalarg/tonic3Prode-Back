@@ -69,7 +69,7 @@ module.exports = {
         const dayOfTheWeek = dateObj.getDay();
         const dayOfTheMonth = dateObj.getDate();
         const month = dateObj.getMonth() + 1;
-        
+
         const newGame = new Games({
           tournaments: tournamentId,
           gameIndex: gameIndex,
@@ -106,12 +106,54 @@ module.exports = {
       next(err);
     }
   },
+  bulkUpdateDate: async (req, res, next) => {
+    const results = req.body.myData;
+    const uid = req.body.uid;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
+    try {
+      const gamesUpdated = [];
+
+      for (let i = 0; i < results.length; i++) {
+        const gameToUpdate = results[i];
+        const gameId = gameToUpdate._id;
+        const month = gameToUpdate.month
+        const hour = gameToUpdate.hour
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek
+
+        const updatedGame = await Games.findOneAndUpdate(
+          { _id: gameId },
+          {
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
+          },
+          { new: true }
+        );
+        gamesUpdated.push(updatedGame);
+      }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        gamesUpdated,
+        "las fechas de los partidos se han actualizado correctamente"
+      );
+      res.send("las fechas de los partidos se han actualizado correctamente");
+    } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
   addManyResults: async (req, res, next) => {
     /* [AGREGAR NUEVOS RESULTADOS] */
     const { id } = req.params;
     const results = req.body.myData;
     const uid = req.body.uid;
-    console.log(results);
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
@@ -128,6 +170,10 @@ module.exports = {
         const awayTeamScore = gameToUpdate.result.awayTeamScore;
         const awayTeamPenalties = gameToUpdate.result.awayTeamPenalties;
         const winningType = gameToUpdate.result.winningType;
+        const month = gameToUpdate.month;
+        const hour = gameToUpdate.hour;
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth;
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek;
         let winningTeam = "";
 
         if (winningType === "regular") {
@@ -136,7 +182,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (regular):", winningTeam);
         } else if (winningType === "penalties") {
           if (
             homeTeamScore + homeTeamPenalties >
@@ -146,7 +191,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (penalties):", winningTeam);
         }
 
         const newstatus = gameToUpdate.result.homeTeamScore
@@ -158,6 +202,10 @@ module.exports = {
           {
             stage: stage,
             status: newstatus,
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
             result: {
               homeTeam: homeTeam ? homeTeam : "",
               awayTeam: awayTeam ? awayTeam : "",
@@ -203,7 +251,7 @@ module.exports = {
       //   console.log(prediction, "prediction");
       //   const user = prediction.userId;
       //   const userHomeTeamScore = prediction[0].prediction.homeTeamScore;
-      //   const userAwayTeamScore = prediction[0].prediction.awayTeamScore;  
+      //   const userAwayTeamScore = prediction[0].prediction.awayTeamScore;
       //   console.log(userHomeTeamScore, "userHomeTeamScore");
       //   console.log(userAwayTeamScore, "userAwayTeamScore");
       // });
@@ -233,6 +281,7 @@ module.exports = {
           }
         }
       });
+      
 
       // si allResultsRegistered es true, entonces se mappean los resultados para obtener los ganadores y se crea una nueva fase
       if (allResultsRegistered) {

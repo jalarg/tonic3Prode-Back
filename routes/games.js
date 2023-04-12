@@ -5,6 +5,7 @@ const {
   getGamesByTournamentId,
   bulkCreateAGames,
   addManyResults,
+  bulkUpdateDate,
   adminEditAGame,
   adminDeleteAGame,
   deleteGames,
@@ -28,6 +29,9 @@ router.put("/admin/:id", addManyResults);
 
 //admin edit a game
 router.put("/admin/addresults/:id", adminEditAGame);
+
+//admin edit many dates
+router.put("/admin/edit/dates", bulkUpdateDate);
 
 //admin delete a game
 router.delete("/admin/delete/:id", adminDeleteAGame); 
