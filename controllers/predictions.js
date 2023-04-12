@@ -1,7 +1,7 @@
-const { Predictions, Users, Teams } = require("../db_models");
+const { Predictions, Users, Teams, Games } = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
-
+const { addPointsToUser, calculatePointsToAdd } = require("../utils/ranking");
 module.exports = {
   // GET DE TODAS LAS PREDICCIONES [SOLO PARA ADMINS]
   getAll: async (req, res, next) => {
@@ -10,9 +10,9 @@ module.exports = {
     validationUser(user, res);
     try {
       const predictions = await Predictions.find()
-      .populate("userId", "name email")
-      .populate("gameId", "details teams")
-      .exec();
+        .populate("userId", "name email")
+        .populate("gameId", "details teams")
+        .exec();
 
       // registro en caso de exito en log
       await createLog(
@@ -208,6 +208,84 @@ module.exports = {
       res.send("The prediction was deleted");
     } catch (err) {
       await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
+  blukCreateGameUserPoints: async (req, res, next) => {
+    const userId = req.params.uid;
+    const predictionsData = req.body;
+    try {
+      const userToUpdatePredictions = await Users.findOne({ uid: userId });
+      if (!userToUpdatePredictions) {
+        return res.status(404).send("User not found");
+      }
+      if (!Array.isArray(predictionsData) || predictionsData.length === 0) {
+        return res.status(400).send({ error: "Invalid or missing games data" });
+      }
+      const predictionsScoreToUpdate = [];
+      for (const predictionData of predictionsData) {
+        const gameId = predictionData.gameId;
+
+        const updateFilter = {
+          userId: userToUpdatePredictions.id,
+          gameId: gameId,
+        };
+        const resultGames = await Games.findOne({ _id: gameId });
+
+        const userPredictions = await Predictions.findOne({
+          userId: userToUpdatePredictions.id,
+        });
+
+        const winningTeam = resultGames.result.winningTeam;
+
+        let userWinner = null;
+
+        let userPredictionsHomeScore = parseInt(
+          userPredictions.prediction.homeTeamScore
+        );
+
+        let userPredictionsAwayScore = parseInt(
+          userPredictions.prediction.awayTeamScore
+        );
+
+        if (
+          userPredictionsHomeScore > userPredictionsAwayScore &&
+          userPredictions.prediction.homeTeamScore !== "" &&
+          userPredictions.prediction.awayTeamScore !== ""
+        ) {
+          userWinner = userPredictions.prediction.homeTeam.name;
+        } else if (
+          userPredictionsHomeScore < userPredictionsAwayScore &&
+          userPredictions.prediction.homeTeamScore !== "" &&
+          userPredictions.prediction.awayTeamScore !== ""
+        ) {
+          userWinner = userPredictions.prediction.awayTeam.name;
+        } else if (userPredictionsHomeScore == userPredictionsHomeScore) {
+          userWinner = "empate"; // Verificar esto
+        } else {
+          userWinner = "";
+        }
+
+        let userGamePoint = 0;
+
+        userGamePoint = calculatePointsToAdd(
+          userWinner,
+          winningTeam,
+          parseInt(userPredictions.prediction.homeTeamScore),
+          parseInt(userPredictions.prediction.awayTeamScore),
+          parseInt(resultGames.result.homeTeamScore),
+          parseInt(resultGames.result.awayTeamScore)
+        );
+
+        const update = { points: userGamePoint };
+
+        const result = await Predictions.updateMany(updateFilter, update);
+        predictionsScoreToUpdate.push(result);
+        console.log("    UPDATED POINTS     ");
+      }
+    } catch (err) {
+      await createLog(predictionsData.userId, "PUT", req.originalUrl, err);
       next(err);
     }
   },

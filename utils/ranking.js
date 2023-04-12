@@ -24,11 +24,13 @@ module.exports = {
     matchAwayTeamScore
   ) => {
     switch (true) {
+      case userWinner === "empate": // Verificar esto
+      return 5
       case userWinner === matchWinner:
-        return 1;
+        return 3;
       case userHomeTeamScore === matchHomeTeamScore &&
         userAwayTeamScore === matchAwayTeamScore:
-        return 3;
+        return 5;
       default:
         return 0;
     }
