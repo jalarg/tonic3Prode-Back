@@ -60,6 +60,7 @@ module.exports = {
         position: 0,
         userId: user._id,
         score: 0,
+        predictions: []
       });
       await newRanking.save();
       await createLog(

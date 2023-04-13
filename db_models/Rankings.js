@@ -12,6 +12,7 @@ const schema = Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   score: { type: Number, required: true },
   timestamp: { type: Date, default: Date.now },
+  predictions: [{ type: Schema.Types.ObjectId, ref: "Predictions" }]
 });
 
 schema.index({ tournamentId: 1, country: 1, position: 1 }, { unique: true });

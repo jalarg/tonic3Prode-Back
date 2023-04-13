@@ -4,6 +4,7 @@ const {
   Tournaments,
   Teams,
   Predictions,
+  Rankings,
 } = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
@@ -340,7 +341,6 @@ module.exports = {
       //Prediccion de cada usuario por juego
 
       if (allGamePredictions.length > 0) {
-
         allGamePredictions.map(async (prediction) => {
           const user = prediction[0].userId;
           console.log("=====PREDICTION=====>", prediction);
@@ -354,8 +354,8 @@ module.exports = {
           const tournamentId = gameObject.tournaments;
           console.log("======== TOURNAMENT ====>", tournamentId);
           //Busqueda del raking segun torneo y usuario ///
-          const rakingToFind = { tournamentId: tournamentId, userId: user };
-          console.log("======== rankingTOFIND ====>", rakingToFind);
+          const rankingToFind = { tournamentId: tournamentId, userId: user };
+          console.log("======== rankingTOFIND ====>", rankingToFind);
 
           const homeTeamScore = parseInt(
             prediction[0].prediction.homeTeamScore
@@ -407,17 +407,42 @@ module.exports = {
           };
 
           const scoresToUpdate = [];
-          const filter = {gameId: gameId}
+          const filter = { gameId: gameId };
           const usersToPushPoints = await Predictions.updateMany(
             filter,
             update
           );
           scoresToUpdate.push(usersToPushPoints);
 
-          /* const updateRanking = await Rankings.updateMany(rakingToFind); */
-        });
-      } else { console.log("No hay predicciones para actualizar") }
+          const existingRanking = await Rankings.findOne(rankingToFind);
+          const score = { prediction: prediction[0]._id};
+          console.log("Rankings Existentes ============>", existingRanking);
+          console.log("score ============>", score);
+          
 
+          rankingPredictions = existingRanking.predictions;
+
+          const index = rankingPredictions.findIndex(
+            (predictions) => predictions._id === prediction[0]._id
+          );
+
+          if (index === -1) {
+            // La predicción no existe en la matriz, la agregamos
+            rankingPredictions.push(prediction[0]._id);
+          } else {
+            // La predicción ya existe en la matriz, actualizamos sus puntos
+            rankingPredictions[index] = prediction[0]._id;
+          }
+
+          console.log("NUEVAS PREDICCIONES DE RANKING", existingRanking );
+
+          const rankingtosend = [];
+          const updateRanking = await Rankings.updateMany(rankingToFind, existingRanking);
+          rankingtosend.push(updateRanking);
+        });
+      } else {
+        console.log("No hay predicciones para actualizar");
+      }
     } catch (err) {
       await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
