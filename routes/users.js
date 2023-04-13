@@ -6,6 +6,8 @@ const {
   findOneUser,
   getAllUsersFromOneTournament,
   createOneUser,
+  generateSecret2FA,
+  verify2FA,
   updateToAdmin,
   deleteUsers,
   deleteOneUser,
@@ -29,6 +31,10 @@ router.get("/tournament/:id", getAllUsersFromOneTournament);
 
 // CREAR UN USUARIO
 router.post("/", createOneUser);
+
+// 2FA 
+router.post("/twofactor/:uid", generateSecret2FA);
+router.post("/twofactor/verify", verify2FA);
 
 //ACTUALIZAR DATOS USUARIO
 router.put("/update/:uid", userUpdate);
