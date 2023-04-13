@@ -1,4 +1,10 @@
-const { Games, Users, Tournaments, Teams, Predictions } = require("../db_models");
+const {
+  Games,
+  Users,
+  Tournaments,
+  Teams,
+  Predictions,
+} = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
 const { addPointsToUser, calculatePointsToAdd } = require("../utils/ranking");
@@ -69,7 +75,7 @@ module.exports = {
         const dayOfTheWeek = dateObj.getDay();
         const dayOfTheMonth = dateObj.getDate();
         const month = dateObj.getMonth() + 1;
-        
+
         const newGame = new Games({
           tournaments: tournamentId,
           gameIndex: gameIndex,
@@ -184,29 +190,91 @@ module.exports = {
 
       /* [CHEQUEO DE ASIGNACION DE PUNTOS] */
       //--------------------------------
-      // mapeo de los Ids de los juegos que tienen resultados
-      // const gameIds = [];
-      // gamesUpdated.forEach(function (game) {
-      //   gameIds.push(game._id);
-      // });
-      // console.log(gameIds, "gameIds");
+      //mapeo de los Ids de los juegos que tienen resultados
+      const usersScoresToUpdate = [];
+      const gameIds = [];
 
-      // // busqueda de las predicciones de los usuarios que tienen resultados
-      // const allGamePredictions = [];
-      // for (let i = 0; i < gameIds.length; i++) {
-      //   const prediction = await Predictions.find({ gameId: gameIds[i] });
-      //   allGamePredictions.push(prediction);
-      // }
-      // console.log(allGamePredictions, "allGamePredictions");
+      gamesUpdated.forEach(function (game) {
+        gameIds.push({
+          gameId: game._id,
+          resultHomeTeam: game.result.homeTeamScore,
+          resultAwayTeam: game.result.awayTeamScore,
+          resultWinningTeam: game.result.winningTeam,
+        });
+      });
 
-      // allGamePredictions.map((prediction) => {
-      //   console.log(prediction, "prediction");
-      //   const user = prediction.userId;
-      //   const userHomeTeamScore = prediction[0].prediction.homeTeamScore;
-      //   const userAwayTeamScore = prediction[0].prediction.awayTeamScore;  
-      //   console.log(userHomeTeamScore, "userHomeTeamScore");
-      //   console.log(userAwayTeamScore, "userAwayTeamScore");
-      // });
+    
+      // busqueda de las predicciones de los usuarios que tienen resultados
+      const allGamePredictions = [];
+      for (let i = 0; i < gameIds.length; i++) {
+        const prediction = await Predictions.find({
+          gameId: gameIds[i].gameId,
+        });
+
+        allGamePredictions.push(prediction);
+      }
+
+      //Prediccion de cada usuario por juego
+      allGamePredictions.map(async (prediction) => {
+        const user = prediction.userId;
+        const userHomeTeamScore = parseInt(
+          prediction[0].prediction.homeTeamScore
+        );
+        const userAwayTeamScore = parseInt(
+          prediction[0].prediction.awayTeamScore
+        );
+        const gameId = prediction[0].gameId;
+
+        let userTeamWinner = null;
+
+        if (
+          userHomeTeamScore > userAwayTeamScore &&
+          prediction[0].prediction.homeTeamScore !== "" &&
+          prediction[0].prediction.awayTeamScore !== ""
+        ) {
+          userTeamWinner = prediction[0].prediction.homeTeam.name;
+        } else if (
+          userHomeTeamScore < userAwayTeamScore &&
+          prediction[0].prediction.homeTeamScore !== "" &&
+          prediction[0].prediction.awayTeamScore !== ""
+        ) {
+          userTeamWinner = prediction[0].prediction.awayTeam.name;
+        } else if (userHomeTeamScore == userAwayTeamScore) {
+          userWinner = "empate"; // Verificar esto
+        } else {
+          userWinner = "";
+        }
+
+        const game = gamesUpdated.find(
+          (g) => g._id.toString() === gameId.toString()
+        );
+
+        let points = 0;
+
+        if (game) {
+          points = calculatePointsToAdd(
+            userTeamWinner,
+            game.result.winningTeam,
+            userHomeTeamScore,
+            userAwayTeamScore,
+            game.result.homeTeamScore,
+            game.result.awayTeamScore
+          );
+        }
+
+        const update = {
+          $set: {
+            points: {
+              gameId: gameId,
+              points: points,
+            },
+          },
+        };
+
+        const userToPushPoints = await Predictions.updateMany(gameId, update);
+        usersScoresToUpdate.push(userToPushPoints);
+      });
+
       // -------------------------------
 
       /* [CREACION DE NUEVOS PARTIDOS] */

@@ -220,35 +220,36 @@ module.exports = {
       if (!userToUpdatePredictions) {
         return res.status(404).send("User not found");
       }
-      if (!Array.isArray(predictionsData) || predictionsData.length === 0) {
-        return res.status(400).send({ error: "Invalid or missing games data" });
-      }
+      // if (!Array.isArray(predictionsData) || predictionsData.length === 0) {
+      //   return res.status(400).send({ error: "Invalid or missing games data" });
+      // }
       const predictionsScoreToUpdate = [];
+      let totalPoints = 0;
       for (const predictionData of predictionsData) {
         const gameId = predictionData.gameId;
-
+  
         const updateFilter = {
           userId: userToUpdatePredictions.id,
           gameId: gameId,
         };
         const resultGames = await Games.findOne({ _id: gameId });
-
+  
         const userPredictions = await Predictions.findOne({
           userId: userToUpdatePredictions.id,
         });
-
+  
         const winningTeam = resultGames.result.winningTeam;
-
+  
         let userWinner = null;
-
+  
         let userPredictionsHomeScore = parseInt(
           userPredictions.prediction.homeTeamScore
         );
-
+  
         let userPredictionsAwayScore = parseInt(
           userPredictions.prediction.awayTeamScore
         );
-
+  
         if (
           userPredictionsHomeScore > userPredictionsAwayScore &&
           userPredictions.prediction.homeTeamScore !== "" &&
@@ -266,9 +267,9 @@ module.exports = {
         } else {
           userWinner = "";
         }
-
+  
         let userGamePoint = 0;
-
+  
         userGamePoint = calculatePointsToAdd(
           userWinner,
           winningTeam,
@@ -277,13 +278,18 @@ module.exports = {
           parseInt(resultGames.result.homeTeamScore),
           parseInt(resultGames.result.awayTeamScore)
         );
-
+  
         const update = { points: userGamePoint };
-
+  
         const result = await Predictions.updateMany(updateFilter, update);
         predictionsScoreToUpdate.push(result);
+        
         console.log("    UPDATED POINTS     ");
       }
+      res.send({
+        totalPoints: totalPoints,
+        updatedPredictions: predictionsScoreToUpdate
+      });
     } catch (err) {
       await createLog(predictionsData.userId, "PUT", req.originalUrl, err);
       next(err);
