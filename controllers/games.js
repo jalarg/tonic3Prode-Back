@@ -112,12 +112,9 @@ module.exports = {
       next(err);
     }
   },
-  addManyResults: async (req, res, next) => {
-    /* [AGREGAR NUEVOS RESULTADOS] */
-    const { id } = req.params;
+  bulkUpdateDate: async (req, res, next) => {
     const results = req.body.myData;
     const uid = req.body.uid;
-    console.log(results);
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
@@ -126,7 +123,52 @@ module.exports = {
       for (let i = 0; i < results.length; i++) {
         const gameToUpdate = results[i];
         const gameId = gameToUpdate._id;
-        const stage = results.length;
+        const month = gameToUpdate.month;
+        const hour = gameToUpdate.hour;
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth;
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek;
+
+        const updatedGame = await Games.findOneAndUpdate(
+          { _id: gameId },
+          {
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
+          },
+          { new: true }
+        );
+        gamesUpdated.push(updatedGame);
+      }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        gamesUpdated,
+        "las fechas de los partidos se han actualizado correctamente"
+      );
+      res.send("las fechas de los partidos se han actualizado correctamente");
+    } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
+  addManyResults: async (req, res, next) => {
+    /* [AGREGAR NUEVOS RESULTADOS] */
+    const { id } = req.params;
+    const results = req.body.myData;
+    const uid = req.body.uid;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
+    try {
+      const gamesUpdated = [];
+
+      for (let i = 0; i < results.length; i++) {
+        const gameToUpdate = results[i];
+        const gameId = gameToUpdate._id;
+        const stage = gameToUpdate.stage;
         const homeTeam = gameToUpdate.teams[0].name;
         const awayTeam = gameToUpdate.teams[1].name;
         const homeTeamScore = gameToUpdate.result.homeTeamScore;
@@ -134,6 +176,10 @@ module.exports = {
         const awayTeamScore = gameToUpdate.result.awayTeamScore;
         const awayTeamPenalties = gameToUpdate.result.awayTeamPenalties;
         const winningType = gameToUpdate.result.winningType;
+        const month = gameToUpdate.month;
+        const hour = gameToUpdate.hour;
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth;
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek;
         let winningTeam = "";
 
         if (winningType === "regular") {
@@ -142,7 +188,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (regular):", winningTeam);
         } else if (winningType === "penalties") {
           if (
             homeTeamScore + homeTeamPenalties >
@@ -152,7 +197,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (penalties):", winningTeam);
         }
 
         const newstatus = gameToUpdate.result.homeTeamScore
@@ -164,6 +208,10 @@ module.exports = {
           {
             stage: stage,
             status: newstatus,
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
             result: {
               homeTeam: homeTeam ? homeTeam : "",
               awayTeam: awayTeam ? awayTeam : "",
@@ -187,6 +235,7 @@ module.exports = {
         gamesUpdated,
         "Se modifican varios resultados de partidos de un torneo a la vez"
       );
+
 
       /* [CHEQUEO DE ASIGNACION DE PUNTOS] */
       //--------------------------------
@@ -277,38 +326,35 @@ module.exports = {
 
       // -------------------------------
 
+
       /* [CREACION DE NUEVOS PARTIDOS] */
       // Verificar si se han registrado resultados para todos los juegos de la fase anterior
       // necesito buscar todos los games de un torneo y filtrar por stage y verificar si el array de resultados tiene resultado
       const games = await Games.find({ tournaments: id });
-
-      // si la cantidad de resultados es igual a la cantidad de juegos de la fase anterior, entonces se cambia allResultsRegistered a true
-      let allResultsRegistered = false;
-      let count = 0;
-      games.forEach(function (game) {
-        console.log(
-          parseInt(game.stage) === results.length,
-          "stage del juego es igual al largo de resultados"
-        );
-        if (
-          game.status === "closed" &&
-          parseInt(game.stage) === results.length
-        ) {
-          console.log("count:", count);
-          count++;
-          if (count === games.length) {
-            allResultsRegistered = true;
-          }
+      let minStage = Number.MAX_SAFE_INTEGER;
+      games.forEach((game) => {
+        if (game.stage < minStage) {
+          minStage = game.stage;
         }
       });
+      console.log("Menor stage encontrado:", minStage);
+      const gamesInStage = games.filter((game) => game.stage === minStage);
+      const allResultsRegistered = gamesInStage.every(
+        (game) => game.status === "closed"
+      );
+      console.log("Todos los resultados registrados:", allResultsRegistered)
 
       // si allResultsRegistered es true, entonces se mappean los resultados para obtener los ganadores y se crea una nueva fase
       if (allResultsRegistered) {
         // Crear un array para almacenar los objetos de los equipos ganadores
         const winningTeams = [];
+        console.log(winningTeams, "antes de buscar los equipos ganadores")
         // Buscar los objetos de los equipos ganadores y agregarlos al array
-        for (const game of games) {
-          const winners = await Teams.find({ name: game.result.winningTeam });
+        for (const game of gamesInStage) {
+          const winners = await Teams.find({
+            name: game.result.winningTeam,
+          });
+          console.log(winners, "winners");
           winningTeams.push(winners);
         }
         if (winningTeams.length === 1) {
@@ -319,8 +365,8 @@ module.exports = {
         for (let i = 0; i < winningTeams.length; i += 2) {
           const team1 = winningTeams[i][0];
           const team2 = winningTeams[i + 1][0];
-
-          const newStage =
+          
+         const newStage =
             winningTeams.length === 16
               ? "8"
               : winningTeams.length === 8
@@ -328,8 +374,10 @@ module.exports = {
               : winningTeams.length === 4
               ? "2"
               : winningTeams.length === 2
-              ? "final"
-              : "";
+              ? "1"
+              : ""
+          console.log(winningTeams.length, "longitud de winningTeams")
+          console.log("Nueva fase:", newStage)
 
           const newGame = new Games({
             tournaments: id,
