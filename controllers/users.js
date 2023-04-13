@@ -77,34 +77,36 @@ module.exports = {
     }
   },
 
-  generateSecret2FA: async (req, res, next) => {  
-  const uid = req.params.uid;
-  try {
-    const secret = speakeasy.generateSecret({
-      length: 20,
-      name: "Gambet",
-      issuer: "My Company",
-    });
+  generateSecret2FA: async (req, res, next) => {
+    const uid = req.params.uid;
+    try {
+      const secret = speakeasy.generateSecret({
+        length: 20,
+        name: "Gambet",
+        issuer: "My Company",
+      });
 
-    const otpauth = speakeasy.otpauthURL({
-      secret: secret.ascii,
-      label: "My App",
-      issuer: "My Company",
-      algorithm: "SHA1",
-      encoding: "base32",
-    });
+      const otpauth = speakeasy.otpauthURL({
+        secret: secret.ascii,
+        label: "Gambet",
+        issuer: "Mi Empresa",
+        algorithm: "SHA1",
+        encoding: "base32",
+      });
 
+      const qr = await qrcode.toDataURL(otpauth);
 
-    const qr = await qrcode.toDataURL(otpauth);
-
-    const user = await Users.findOne({uid:uid});
-    // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
-    await Users.findByIdAndUpdate(user._id, { twoFactorSecret: secret.base32 });
-    res.json({ secret: secret.ascii, qr });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error generating 2FA code");
-  }
+      const user = await Users.findOne({ uid: uid });
+      // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
+      await Users.findByIdAndUpdate(user._id, {
+        twoFactorSecret: secret.base32,
+      });
+      console.log(user.twoFactorSecret);
+      res.json({ secret: secret.base32, qr });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error generating 2FA code");
+    }
   },
 
   verify2FA: async (req, res, next) => {
@@ -113,8 +115,8 @@ module.exports = {
       const token = req.body.token;
 
       // Recupera el secreto del usuario
-      const user = await Users.findById(uid);
-      const secret = user.secret;
+      const user = await Users.findOne({ uid: uid });
+      const secret = user.twoFactorSecret;
 
       // Verifica el token
       const verified = speakeasy.totp.verify({
