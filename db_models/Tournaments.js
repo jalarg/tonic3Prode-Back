@@ -8,7 +8,7 @@ const schema = Schema({
   ending: { type: Date, required: true },
   stage: {
     type: String,
-    enum: ["groups", "initial", "32", "16", "8", "4", "2"],
+    enum: ["groups", "initial", "32", "16", "8", "4", "2", "1"],
     require: true,
   },
   title: { type: String, required: true },
