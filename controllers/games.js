@@ -1,4 +1,11 @@
-const { Games, Users, Tournaments, Teams, Predictions } = require("../db_models");
+const {
+  Games,
+  Users,
+  Tournaments,
+  Teams,
+  Predictions,
+  Rankings,
+} = require("../db_models");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
 const { addPointsToUser, calculatePointsToAdd } = require("../utils/ranking");
@@ -69,7 +76,7 @@ module.exports = {
         const dayOfTheWeek = dateObj.getDay();
         const dayOfTheMonth = dateObj.getDate();
         const month = dateObj.getMonth() + 1;
-        
+
         const newGame = new Games({
           tournaments: tournamentId,
           gameIndex: gameIndex,
@@ -106,12 +113,9 @@ module.exports = {
       next(err);
     }
   },
-  addManyResults: async (req, res, next) => {
-    /* [AGREGAR NUEVOS RESULTADOS] */
-    const { id } = req.params;
+  bulkUpdateDate: async (req, res, next) => {
     const results = req.body.myData;
     const uid = req.body.uid;
-    console.log(results);
     const user = await Users.findOne({ uid });
     validationUser(user, res);
     try {
@@ -120,7 +124,52 @@ module.exports = {
       for (let i = 0; i < results.length; i++) {
         const gameToUpdate = results[i];
         const gameId = gameToUpdate._id;
-        const stage = results.length;
+        const month = gameToUpdate.month;
+        const hour = gameToUpdate.hour;
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth;
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek;
+
+        const updatedGame = await Games.findOneAndUpdate(
+          { _id: gameId },
+          {
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
+          },
+          { new: true }
+        );
+        gamesUpdated.push(updatedGame);
+      }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        gamesUpdated,
+        "las fechas de los partidos se han actualizado correctamente"
+      );
+      res.send("las fechas de los partidos se han actualizado correctamente");
+    } catch (err) {
+      await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
+  addManyResults: async (req, res, next) => {
+    /* [AGREGAR NUEVOS RESULTADOS] */
+    const { id } = req.params;
+    const results = req.body.myData;
+    const uid = req.body.uid;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
+    try {
+      const gamesUpdated = [];
+
+      for (let i = 0; i < results.length; i++) {
+        const gameToUpdate = results[i];
+        const gameId = gameToUpdate._id;
+        const stage = gameToUpdate.stage;
         const homeTeam = gameToUpdate.teams[0].name;
         const awayTeam = gameToUpdate.teams[1].name;
         const homeTeamScore = gameToUpdate.result.homeTeamScore;
@@ -128,6 +177,10 @@ module.exports = {
         const awayTeamScore = gameToUpdate.result.awayTeamScore;
         const awayTeamPenalties = gameToUpdate.result.awayTeamPenalties;
         const winningType = gameToUpdate.result.winningType;
+        const month = gameToUpdate.month;
+        const hour = gameToUpdate.hour;
+        const dayOfTheMonth = gameToUpdate.dayOfTheMonth;
+        const dayOfTheWeek = gameToUpdate.dayOfTheWeek;
         let winningTeam = "";
 
         if (winningType === "regular") {
@@ -136,7 +189,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (regular):", winningTeam);
         } else if (winningType === "penalties") {
           if (
             homeTeamScore + homeTeamPenalties >
@@ -146,7 +198,6 @@ module.exports = {
           } else {
             winningTeam = awayTeam;
           }
-          console.log("Winning team (penalties):", winningTeam);
         }
 
         const newstatus = gameToUpdate.result.homeTeamScore
@@ -158,6 +209,10 @@ module.exports = {
           {
             stage: stage,
             status: newstatus,
+            dayOfTheMonth: dayOfTheMonth,
+            dayOfTheWeek: dayOfTheWeek,
+            month: month,
+            hour: hour,
             result: {
               homeTeam: homeTeam ? homeTeam : "",
               awayTeam: awayTeam ? awayTeam : "",
@@ -182,65 +237,34 @@ module.exports = {
         "Se modifican varios resultados de partidos de un torneo a la vez"
       );
 
-      /* [CHEQUEO DE ASIGNACION DE PUNTOS] */
-      //--------------------------------
-      // mapeo de los Ids de los juegos que tienen resultados
-      // const gameIds = [];
-      // gamesUpdated.forEach(function (game) {
-      //   gameIds.push(game._id);
-      // });
-      // console.log(gameIds, "gameIds");
-
-      // // busqueda de las predicciones de los usuarios que tienen resultados
-      // const allGamePredictions = [];
-      // for (let i = 0; i < gameIds.length; i++) {
-      //   const prediction = await Predictions.find({ gameId: gameIds[i] });
-      //   allGamePredictions.push(prediction);
-      // }
-      // console.log(allGamePredictions, "allGamePredictions");
-
-      // allGamePredictions.map((prediction) => {
-      //   console.log(prediction, "prediction");
-      //   const user = prediction.userId;
-      //   const userHomeTeamScore = prediction[0].prediction.homeTeamScore;
-      //   const userAwayTeamScore = prediction[0].prediction.awayTeamScore;  
-      //   console.log(userHomeTeamScore, "userHomeTeamScore");
-      //   console.log(userAwayTeamScore, "userAwayTeamScore");
-      // });
-      // -------------------------------
-
       /* [CREACION DE NUEVOS PARTIDOS] */
       // Verificar si se han registrado resultados para todos los juegos de la fase anterior
       // necesito buscar todos los games de un torneo y filtrar por stage y verificar si el array de resultados tiene resultado
       const games = await Games.find({ tournaments: id });
-
-      // si la cantidad de resultados es igual a la cantidad de juegos de la fase anterior, entonces se cambia allResultsRegistered a true
-      let allResultsRegistered = false;
-      let count = 0;
-      games.forEach(function (game) {
-        console.log(
-          parseInt(game.stage) === results.length,
-          "stage del juego es igual al largo de resultados"
-        );
-        if (
-          game.status === "closed" &&
-          parseInt(game.stage) === results.length
-        ) {
-          console.log("count:", count);
-          count++;
-          if (count === games.length) {
-            allResultsRegistered = true;
-          }
+      let minStage = Number.MAX_SAFE_INTEGER;
+      games.forEach((game) => {
+        if (game.stage < minStage) {
+          minStage = game.stage;
         }
       });
+      console.log("Menor stage encontrado:", minStage);
+      const gamesInStage = games.filter((game) => game.stage === minStage);
+      const allResultsRegistered = gamesInStage.every(
+        (game) => game.status === "closed"
+      );
+      console.log("Todos los resultados registrados:", allResultsRegistered);
 
       // si allResultsRegistered es true, entonces se mappean los resultados para obtener los ganadores y se crea una nueva fase
       if (allResultsRegistered) {
         // Crear un array para almacenar los objetos de los equipos ganadores
         const winningTeams = [];
+        console.log(winningTeams, "antes de buscar los equipos ganadores");
         // Buscar los objetos de los equipos ganadores y agregarlos al array
-        for (const game of games) {
-          const winners = await Teams.find({ name: game.result.winningTeam });
+        for (const game of gamesInStage) {
+          const winners = await Teams.find({
+            name: game.result.winningTeam,
+          });
+          console.log(winners, "winners");
           winningTeams.push(winners);
         }
         if (winningTeams.length === 1) {
@@ -260,8 +284,10 @@ module.exports = {
               : winningTeams.length === 4
               ? "2"
               : winningTeams.length === 2
-              ? "final"
+              ? "1"
               : "";
+          console.log(winningTeams.length, "longitud de winningTeams");
+          console.log("Nueva fase:", newStage);
 
           const newGame = new Games({
             tournaments: id,
@@ -282,6 +308,141 @@ module.exports = {
         }
       }
       res.send("Los resultados se han agregado correctamente");
+
+      // [CREACION DE RANKING]
+
+      const gameIds = [];
+
+      gamesUpdated.forEach(function (game) {
+        gameIds.push({
+          gameId: game._id,
+          resultHomeTeam: game.result.homeTeamScore,
+          resultAwayTeam: game.result.awayTeamScore,
+          resultHomeTeamPenalties: game.result.homeTeamPenalties,
+          resultAwayTeamPenalties: game.result.awayTeamPenalties,
+          resultWinningTeam: game.result.winningTeam,
+        });
+      });
+      console.log("========= LIENA253 =====>", gameIds);
+      // busqueda de las predicciones de los usuarios que tienen resultados
+
+      const allGamePredictions = [];
+
+      for (let i = 0; i < gameIds.length; i++) {
+        console.log("=======PREDICTION 259====>", gameIds[i].gameId);
+        const prediction = await Predictions.find({
+          gameId: gameIds[i].gameId,
+        });
+
+        console.log("=======PREDICTION 264====>", prediction);
+        allGamePredictions.push(prediction);
+      }
+
+      //Prediccion de cada usuario por juego
+
+      if (allGamePredictions.length > 0) {
+        allGamePredictions.map(async (prediction) => {
+          const user = prediction[0].userId;
+          console.log("=====PREDICTION=====>", prediction);
+          const gameId = prediction[0].gameId;
+
+          const game = gamesUpdated.find(
+            (g) => g._id.toString() === gameId.toString()
+          );
+
+          const gameObject = await Games.findOne({ _id: gameId });
+          const tournamentId = gameObject.tournaments;
+          console.log("======== TOURNAMENT ====>", tournamentId);
+          //Busqueda del raking segun torneo y usuario ///
+          const rankingToFind = { tournamentId: tournamentId, userId: user };
+          console.log("======== rankingTOFIND ====>", rankingToFind);
+
+          const homeTeamScore = parseInt(
+            prediction[0].prediction.homeTeamScore
+          );
+          const awayTeamScore = parseInt(
+            prediction[0].prediction.awayTeamScore
+          );
+
+          let userTeamWinner = null;
+
+          if (
+            homeTeamScore > awayTeamScore &&
+            prediction[0].prediction.homeTeamScore !== "" &&
+            prediction[0].prediction.awayTeamScore !== ""
+          ) {
+            userTeamWinner = prediction[0].prediction.homeTeam.name;
+          } else if (
+            homeTeamScore < awayTeamScore &&
+            prediction[0].prediction.homeTeamScore !== "" &&
+            prediction[0].prediction.awayTeamScore !== ""
+          ) {
+            userTeamWinner = prediction[0].prediction.awayTeam.name;
+          } else if (
+            homeTeamScore == awayTeamScore &&
+            prediction[0].prediction.homeTeamScore !== "" &&
+            prediction[0].prediction.awayTeamScore !== ""
+          ) {
+            userTeamWinner = game.result.winningTeam;
+          } else {
+            userTeamWinner = "";
+          }
+
+          let points = 0;
+
+          if (game) {
+            points = calculatePointsToAdd(
+              userTeamWinner,
+              game.result.winningTeam,
+              homeTeamScore,
+              awayTeamScore,
+              parseInt(game.result.homeTeamScore),
+              parseInt(game.result.awayTeamScore)
+            );
+          }
+
+          console.log("=======PREDICTION 397====>", points);
+          const update = {
+            points: points,
+          };
+
+          const scoresToUpdate = [];
+          const filter = { gameId: gameId };
+          const usersToPushPoints = await Predictions.updateMany(
+            filter,
+            update
+          );
+          scoresToUpdate.push(usersToPushPoints);
+
+          const existingRanking = await Rankings.findOne(rankingToFind);
+          const score = { prediction: prediction[0]._id};
+          console.log("Rankings Existentes ============>", existingRanking);
+          console.log("score ============>", score);
+          
+
+          rankingPredictions = existingRanking.predictions;
+
+          const index = rankingPredictions.findIndex(
+            (predictions) => predictions._id === prediction[0]._id
+          );
+
+          if (index === -1) {
+            // La predicción no existe en la matriz, la agregamos
+            rankingPredictions.push(prediction[0]._id);
+          } else {
+            // La predicción ya existe en la matriz, actualizamos sus puntos
+            rankingPredictions[index] = prediction[0]._id;
+          }
+
+          console.log("NUEVAS PREDICCIONES DE RANKING", existingRanking );
+
+          const rankingtosend = [];
+          const updateRanking = await Rankings.updateMany(rankingToFind, existingRanking);
+          rankingtosend.push(updateRanking);
+        });
+      } else {
+        console.log("No hay predicciones para actualizar");
+      }
     } catch (err) {
       await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);

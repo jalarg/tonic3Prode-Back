@@ -2,6 +2,8 @@ const { Users } = require("../db_models");
 const { createLog } = require("../utils/createLog");
 const { validationSuperAdmin } = require("../utils/environments");
 const emailVerification = require("../utils/mailer");
+const speakeasy = require("speakeasy");
+const qrcode = require("qrcode");
 
 module.exports = {
   // RUTAS GENERALES DE PEDIDO GET
@@ -75,6 +77,71 @@ module.exports = {
     }
   },
 
+  generateSecret2FA: async (req, res, next) => {
+    const uid = req.params.uid;
+    try {
+    const user = await Users.findOne({ uid: uid });
+    if (user.twoFactorSecret) {
+      // Si el usuario ya tiene un secreto 2FA registrado, devolvemos un mensaje indicando que no se puede generar un nuevo secreto 2FA
+      console.log("ENTRE EN LA CONDICION Y NO GENERO NUEVO 2FA")
+      return res.send({ message: "Ya tiene un secreto 2FA registrado. No se puede generar uno nuevo." });
+    } else {
+
+      const secret = speakeasy.generateSecret({
+        length: 20,
+        name: "Gambet",
+        issuer: "My Company",
+      });
+
+      const otpauth = speakeasy.otpauthURL({
+        secret: secret.ascii,
+        label: "Gambet",
+        issuer: "Mi Empresa",
+        algorithm: "SHA1",
+        encoding: "base32",
+      });
+
+      const qr = await qrcode.toDataURL(otpauth);
+
+
+      // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
+      await Users.findByIdAndUpdate(user._id, {
+        twoFactorSecret: secret.base32,
+      });
+      console.log(user.twoFactorSecret);
+      res.json({ secret: secret.base32, qr });
+    }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error generating 2FA code");
+    }
+  },
+  verify2FA: async (req, res, next) => {
+    try {
+      const uid = req.body.uid;
+      const token = req.body.token;
+
+      // Recupera el secreto del usuario
+      const user = await Users.findOne({ uid: uid });
+      const secret = user.twoFactorSecret;
+
+      // Verifica el token
+      const verified = speakeasy.totp.verify({
+        secret: secret,
+        encoding: "base32",
+        token: token,
+        window: 2,
+      });
+      if (verified) {
+        res.status(200).json({ message: "Verification successful" });
+      } else {
+        res.status(401).json({ message: "Invalid verification code" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
   // RUTA DE CREACION DE USUARIOS
   createOneUser: async (req, res, next) => {
     const { uid } = req.body;

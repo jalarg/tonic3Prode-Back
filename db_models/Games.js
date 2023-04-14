@@ -7,7 +7,7 @@ const schema = Schema({
   gameIndex: { type: Number, required: true },
   stage: {
     type: String,
-    enum: ["groups", "initial", "32", "16", "8", "4", "2"],
+    enum: ["","groups", "initial", "32", "16", "8", "4", "2", "1"],
     require: true,
   },
   status: { type: String, required: true, default: "pending" },
@@ -17,11 +17,6 @@ const schema = Schema({
   month: { type: Number, required: true },
   details: { type: String },
   teams: { type: Array, required: true },
-  stage: {
-    type: String,
-    enum: ["groups", "initial", "32", "16", "8", "4", "2", "final"],
-    require: true,
-  },
   result: {
     type: Object,
     default: {

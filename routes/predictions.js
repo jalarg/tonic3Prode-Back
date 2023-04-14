@@ -5,6 +5,7 @@ const {
   findUserPredictions,
   bulkCreatePredictions,
   bulkUpdatePredictions,
+  blukCreateGameUserPoints,
   deleteAllPredictions,
   deleteOnePrediction,
 } = require("../controllers/predictions");
@@ -22,6 +23,9 @@ router.post("/create/:uid", bulkCreatePredictions);
 
 // MODIFICAR VARIAS PREDICCIONES  
 router.put("/:uid", bulkUpdatePredictions);
+
+// AGREGAR PUNTOS GANADOS POR EL USUARIO 
+router.put("/points/:uid", blukCreateGameUserPoints)
 
 //----- RUTAS SOLO PARA TESTING EN BACK -----//
 
