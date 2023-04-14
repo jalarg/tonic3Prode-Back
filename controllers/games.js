@@ -413,14 +413,15 @@ module.exports = {
             update
           );
           scoresToUpdate.push(usersToPushPoints);
-
+          ///////////// Raking /////////////////
           const existingRanking = await Rankings.findOne(rankingToFind);
-          const score = { prediction: prediction[0]._id};
+          const score = { prediction: prediction }; //Cambio
           console.log("Rankings Existentes ============>", existingRanking);
-          console.log("score ============>", score);
-          
+          console.log("SCOREEEEE 420 ============>", score);
 
-          rankingPredictions = existingRanking.predictions;
+          let rankingPredictions = existingRanking.predictions;
+
+          console.log("===== RANKING 424=======>", rankingPredictions);
 
           const index = rankingPredictions.findIndex(
             (predictions) => predictions._id === prediction[0]._id
@@ -428,17 +429,22 @@ module.exports = {
 
           if (index === -1) {
             // La predicción no existe en la matriz, la agregamos
-            rankingPredictions.push(prediction[0]._id);
+            rankingPredictions.push(prediction);
           } else {
             // La predicción ya existe en la matriz, actualizamos sus puntos
-            rankingPredictions[index] = prediction[0]._id;
+            rankingPredictions[index] = prediction;
           }
 
-          console.log("NUEVAS PREDICCIONES DE RANKING", existingRanking );
+          console.log("NUEVAS PREDICCIONES DE RANKING", existingRanking);
 
           const rankingtosend = [];
-          const updateRanking = await Rankings.updateMany(rankingToFind, existingRanking);
+          const updateRanking = await Rankings.updateMany(
+            rankingToFind,
+            existingRanking
+          );
           rankingtosend.push(updateRanking);
+
+          console.log("NUEVAS PREDICCIONES DE RANKING", updateRanking);
         });
       } else {
         console.log("No hay predicciones para actualizar");
