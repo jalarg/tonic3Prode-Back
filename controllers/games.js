@@ -289,6 +289,35 @@ module.exports = {
           console.log(winningTeams.length, "longitud de winningTeams");
           console.log("Nueva fase:", newStage);
 
+          // Obtén la fecha actual
+          const currentDate = new Date();
+
+          // Genera valores aleatorios para la fecha
+          const oneDayMs = 24 * 60 * 60 * 1000; // milisegundos en un día
+          const oneMonthMs = 30 * oneDayMs; // milisegundos en un mes
+          const randomDays = Math.floor(Math.random() * 7) + 1; // un número aleatorio de 1 a 7
+          const randomMonth = Math.floor(Math.random() * 3) + 1; // un número aleatorio de 1 a 3
+          const randomHour = Math.floor(Math.random() * 24); // un número aleatorio de 0 a 23
+          const randomDayOfMonth = Math.min(
+            Math.floor(Math.random() * 30) + 1,
+            new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth() + randomMonth,
+              0
+            ).getDate()
+          );
+
+          // Crea la nueva fecha sumando los valores aleatorios a la fecha actual
+          const newDate = new Date(
+            currentDate.getTime() +
+              randomDays * oneDayMs +
+              randomMonth * oneMonthMs +
+              randomHour * 60 * 60 * 1000
+          );
+          // establece los valores de día del mes y hora
+          newDate.setDate(randomDayOfMonth);
+          newDate.setHours(randomHour);
+          
           const newGame = new Games({
             tournaments: id,
             gameIndex: gameIndex++,
@@ -296,10 +325,10 @@ module.exports = {
             status: "pending",
             details: "details of the match",
             teams: [team1, team2],
-            dayOfTheWeek: 0,
-            dayOfTheMonth: 0,
-            month: 0,
-            hour: 0,
+            dayOfTheWeek: newDate.getDay(),
+            dayOfTheMonth: newDate.getDate() + 1,
+            month: newDate.getMonth(),
+            hour: newDate.getHours(),
           });
           console.log("Juegos creados", newGame);
 
@@ -382,37 +411,37 @@ module.exports = {
         allGamesPredictions.push(gamePredictions);
       }
 
-      const promises = allGamesPredictions.flatMap(gamePredictions =>
-        gamePredictions.map(prediction => {
+      const promises = allGamesPredictions.flatMap((gamePredictions) =>
+        gamePredictions.map((prediction) => {
           return Predictions.findOneAndUpdate(
             { _id: prediction._id },
             { points: prediction.points }
           );
         })
       );
-      
-      const rankingsPromises = allGamesPredictions.flatMap(gamePredictions =>
-        gamePredictions.map(prediction => {
+
+      const rankingsPromises = allGamesPredictions.flatMap((gamePredictions) =>
+        gamePredictions.map((prediction) => {
           console.log("PREDICTION", prediction);
           return Rankings.findOneAndUpdate(
             {
               userId: prediction.userId,
               tournamentId: id,
-              predictions: { $in: [prediction._id] } // busca si la prediccion._id se encuentra en el array de predictions
+              predictions: { $in: [prediction._id] }, // busca si la prediccion._id se encuentra en el array de predictions
             },
             {
-              $set: { "predictions.$": prediction } // actualiza la prediccion correspondiente si se encuentra
+              $set: { "predictions.$": prediction }, // actualiza la prediccion correspondiente si se encuentra
             },
             { new: true } // devuelve el documento actualizado
-          ).then(rankings => {
+          ).then((rankings) => {
             if (!rankings) {
               return Rankings.updateOne(
                 {
                   userId: prediction.userId,
-                  tournamentId: id
+                  tournamentId: id,
                 },
                 {
-                  $push: { predictions: prediction } // agrega la prediccion si no se encuentra en la entrada de Ranking
+                  $push: { predictions: prediction }, // agrega la prediccion si no se encuentra en la entrada de Ranking
                 },
                 { upsert: true } // crea una nueva entrada si no se encuentra ninguna
               );
@@ -421,11 +450,11 @@ module.exports = {
           });
         })
       );
-      
+
       const rankings = await Promise.all(rankingsPromises);
       console.log("RANKINGS", rankings);
 
-      res.send("ranking actualizado")
+      res.send("ranking actualizado");
     } catch (err) {
       console.log(err);
     }
