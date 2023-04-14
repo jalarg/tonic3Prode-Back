@@ -4,6 +4,7 @@ const { createLog } = require("../utils/createLog");
 
 module.exports = {
   // RUTAS GENERALES
+  
   getAll: async (req, res, next) => {
     const { uid } = req.params;
     const { tournamentId } = req.params;
