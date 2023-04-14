@@ -376,27 +376,56 @@ module.exports = {
           } else {
             points = 0;
           }
-          console.log(
-            "homeTeamScore Prediction",
-            prediction.prediction.homeTeamScore
-          );
-          console.log(
-            "AwayTeamScore Prediction",
-            prediction.prediction.awayTeamScore
-          );
-          console.log("homeTeamScore Game", homeTeamScore);
-          console.log("AwayTeamScore Game", awayTeamScore);
-          console.log("homeTeamPenalties Game", homeTeamPenalties);
-          console.log("AwayTeamPenalties Game", awayTeamPenalties);
-          console.log("PUNTOSSSSSSSSSSSSSSSSSSSSSS", points);
           prediction.points = points;
         });
 
         allGamesPredictions.push(gamePredictions);
       }
-      //Predicciones ===> [ Paritdo [ predicion1 {}, prediccion2{}]]
-      console.log(allGamesPredictions);
-      res.send("Ranking actualizado");
+
+      const promises = allGamesPredictions.flatMap(gamePredictions =>
+        gamePredictions.map(prediction => {
+          return Predictions.findOneAndUpdate(
+            { _id: prediction._id },
+            { points: prediction.points }
+          );
+        })
+      );
+      
+      const rankingsPromises = allGamesPredictions.flatMap(gamePredictions =>
+        gamePredictions.map(prediction => {
+          console.log("PREDICTION", prediction);
+          return Rankings.findOneAndUpdate(
+            {
+              userId: prediction.userId,
+              tournamentId: id,
+              predictions: { $in: [prediction._id] } // busca si la prediccion._id se encuentra en el array de predictions
+            },
+            {
+              $set: { "predictions.$": prediction } // actualiza la prediccion correspondiente si se encuentra
+            },
+            { new: true } // devuelve el documento actualizado
+          ).then(rankings => {
+            if (!rankings) {
+              return Rankings.updateOne(
+                {
+                  userId: prediction.userId,
+                  tournamentId: id
+                },
+                {
+                  $push: { predictions: prediction } // agrega la prediccion si no se encuentra en la entrada de Ranking
+                },
+                { upsert: true } // crea una nueva entrada si no se encuentra ninguna
+              );
+            }
+            return rankings;
+          });
+        })
+      );
+      
+      const rankings = await Promise.all(rankingsPromises);
+      console.log("RANKINGS", rankings);
+
+      res.send("ranking actualizado")
     } catch (err) {
       console.log(err);
     }
