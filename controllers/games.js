@@ -307,6 +307,8 @@ module.exports = {
             ).getDate()
           );
 
+
+          
           // Crea la nueva fecha sumando los valores aleatorios a la fecha actual
           const newDate = new Date(
             currentDate.getTime() +
@@ -317,7 +319,7 @@ module.exports = {
           // establece los valores de día del mes y hora
           newDate.setDate(randomDayOfMonth);
           newDate.setHours(randomHour);
-          
+
           const newGame = new Games({
             tournaments: id,
             gameIndex: gameIndex++,

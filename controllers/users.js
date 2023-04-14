@@ -4,6 +4,8 @@ const { validationSuperAdmin } = require("../utils/environments");
 const emailVerification = require("../utils/mailer");
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
+const axios = require("axios");
+
 
 module.exports = {
   // RUTAS GENERALES DE PEDIDO GET
@@ -80,37 +82,38 @@ module.exports = {
   generateSecret2FA: async (req, res, next) => {
     const uid = req.params.uid;
     try {
-    const user = await Users.findOne({ uid: uid });
-    if (user.twoFactorSecret) {
-      // Si el usuario ya tiene un secreto 2FA registrado, devolvemos un mensaje indicando que no se puede generar un nuevo secreto 2FA
-      console.log("ENTRE EN LA CONDICION Y NO GENERO NUEVO 2FA")
-      return res.send({ message: "Ya tiene un secreto 2FA registrado. No se puede generar uno nuevo." });
-    } else {
+      const user = await Users.findOne({ uid: uid });
+      if (user.twoFactorSecret) {
+        // Si el usuario ya tiene un secreto 2FA registrado, devolvemos un mensaje indicando que no se puede generar un nuevo secreto 2FA
+        console.log("ENTRE EN LA CONDICION Y NO GENERO NUEVO 2FA");
+        return res.send({
+          message:
+            "Ya tiene un secreto 2FA registrado. No se puede generar uno nuevo.",
+        });
+      } else {
+        const secret = speakeasy.generateSecret({
+          length: 20,
+          name: "Gambet",
+          issuer: "My Company",
+        });
 
-      const secret = speakeasy.generateSecret({
-        length: 20,
-        name: "Gambet",
-        issuer: "My Company",
-      });
+        const otpauth = speakeasy.otpauthURL({
+          secret: secret.ascii,
+          label: "Gambet",
+          issuer: "Mi Empresa",
+          algorithm: "SHA1",
+          encoding: "base32",
+        });
 
-      const otpauth = speakeasy.otpauthURL({
-        secret: secret.ascii,
-        label: "Gambet",
-        issuer: "Mi Empresa",
-        algorithm: "SHA1",
-        encoding: "base32",
-      });
+        const qr = await qrcode.toDataURL(otpauth);
 
-      const qr = await qrcode.toDataURL(otpauth);
-
-
-      // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
-      await Users.findByIdAndUpdate(user._id, {
-        twoFactorSecret: secret.base32,
-      });
-      console.log(user.twoFactorSecret);
-      res.json({ secret: secret.base32, qr });
-    }
+        // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
+        await Users.findByIdAndUpdate(user._id, {
+          twoFactorSecret: secret.base32,
+        });
+        console.log(user.twoFactorSecret);
+        res.json({ secret: secret.base32, qr });
+      }
     } catch (error) {
       console.error(error);
       res.status(500).send("Error generating 2FA code");
@@ -164,6 +167,34 @@ module.exports = {
     } catch (err) {
       await createLog(uid, "GET", req.originalUrl, err); // registro en caso de error
       next(err);
+    }
+  },
+  // RUTA PARA NOTIFICACIONES PUSH
+  sendPushNotification: async (req, res, next) => {
+    const { uid } = req.params;
+    const { deviceRegistrationToken, title, body } = req.body;
+    try {
+      const apiKey =
+        "BLfG68c-Siz5l-fQ2t0PTtnu98KF7Hr7AhuWgiCmoK_LttoForDNSVvFsoXlajkUsc1kjdetbGW3a-9V0DVyesI";
+      const url = "https://fcm.googleapis.com/fcm/send";
+      const message = {
+        notification: {
+          title: title, 
+          body: body,
+        },
+        to: deviceRegistrationToken,
+      };
+      const response = await axios.post(url, message, {
+        headers: {
+          Authorization: "key=" + apiKey,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Mensaje enviado con éxito");
+      res.send(response.data);
+    } catch (error) {
+      await createLog(uid, "POST", req.originalUrl, error);
+      next(error);
     }
   },
 
