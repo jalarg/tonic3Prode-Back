@@ -109,6 +109,19 @@ module.exports = {
     }
   },
 
+  erase2FA: async (req, res, next) => {
+    console.log("pegue");
+    try {
+      const uid = req.params.uid;
+      const user = await Users.findOne({ uid: uid });
+      await Users.findByIdAndUpdate(user._id, {
+        twoFactorSecret: "",
+      });
+    } catch {
+      res.status(500).send("Error erasing 2FA code");
+    }
+  },
+
   verify2FA: async (req, res, next) => {
     try {
       const uid = req.body.uid;
