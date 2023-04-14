@@ -15,7 +15,7 @@ const schema = Schema({
   tournaments: [{ type: Schema.Types.ObjectId, ref: "tournaments" }],
   scores: { type: Object, default: {} },
   isVerified: { type: Boolean, default: false },
-  twoFactorSecret: { type: String },
+  twoFactorSecret: { type: String, default: null },
 });
 
 // SET VIRTUAL FULL NAME

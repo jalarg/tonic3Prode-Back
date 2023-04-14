@@ -12,7 +12,6 @@ const {
   deleteUsers,
   deleteOneUser,
   userUpdate,
-  erase2FA,
 } = require("../controllers/users");
 
 //-----------RUTAS GENERALES-------------//
@@ -36,7 +35,6 @@ router.post("/", createOneUser);
 // 2FA
 router.post("/twofactor/:uid", generateSecret2FA);
 router.post("/2FA/verify", verify2FA);
-router.post("/twofactor/erase/:uid", erase2FA);
 
 //ACTUALIZAR DATOS USUARIO
 router.put("/update/:uid", userUpdate);

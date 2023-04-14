@@ -80,6 +80,13 @@ module.exports = {
   generateSecret2FA: async (req, res, next) => {
     const uid = req.params.uid;
     try {
+    const user = await Users.findOne({ uid: uid });
+    if (user.twoFactorSecret) {
+      // Si el usuario ya tiene un secreto 2FA registrado, devolvemos un mensaje indicando que no se puede generar un nuevo secreto 2FA
+      console.log("ENTRE EN LA CONDICION Y NO GENERO NUEVO 2FA")
+      return res.send({ message: "Ya tiene un secreto 2FA registrado. No se puede generar uno nuevo." });
+    } else {
+
       const secret = speakeasy.generateSecret({
         length: 20,
         name: "Gambet",
@@ -96,32 +103,19 @@ module.exports = {
 
       const qr = await qrcode.toDataURL(otpauth);
 
-      const user = await Users.findOne({ uid: uid });
+
       // Aquí guardamos el secreto en la base de datos para el usuario correspondiente
       await Users.findByIdAndUpdate(user._id, {
         twoFactorSecret: secret.base32,
       });
       console.log(user.twoFactorSecret);
       res.json({ secret: secret.base32, qr });
+    }
     } catch (error) {
       console.error(error);
       res.status(500).send("Error generating 2FA code");
     }
   },
-
-  erase2FA: async (req, res, next) => {
-    console.log("pegue");
-    try {
-      const uid = req.params.uid;
-      const user = await Users.findOne({ uid: uid });
-      await Users.findByIdAndUpdate(user._id, {
-        twoFactorSecret: "",
-      });
-    } catch {
-      res.status(500).send("Error erasing 2FA code");
-    }
-  },
-
   verify2FA: async (req, res, next) => {
     try {
       const uid = req.body.uid;
@@ -138,7 +132,6 @@ module.exports = {
         token: token,
         window: 2,
       });
-
       if (verified) {
         res.status(200).json({ message: "Verification successful" });
       } else {
