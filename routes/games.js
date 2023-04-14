@@ -9,6 +9,7 @@ const {
   adminEditAGame,
   adminDeleteAGame,
   deleteGames,
+  adminUpdateRanking
 } = require("../controllers/games");
 
 //----------- RUTAS GENERALES -------------//
@@ -26,6 +27,9 @@ router.post("/admin/:id", bulkCreateAGames);
 
 // update many results 
 router.put("/admin/:id", addManyResults);
+
+// update many results 
+router.put("/admin/ranking/:id", adminUpdateRanking);
 
 //admin edit a game
 router.put("/admin/addresults/:id", adminEditAGame);
