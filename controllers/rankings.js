@@ -17,7 +17,8 @@ module.exports = {
         country: country,
       })
         .sort({ position: 1 })
-        .populate("userId");
+        .populate("userId")
+        .populate("predictions");
       await createLog(
         uid,
         "GET",
