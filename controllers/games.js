@@ -308,146 +308,129 @@ module.exports = {
         }
       }
       res.send("Los resultados se han agregado correctamente");
-
-      // [CREACION DE RANKING]
-
-      const gameIds = [];
-
-      gamesUpdated.forEach(function (game) {
-        gameIds.push({
-          gameId: game._id,
-          resultHomeTeam: game.result.homeTeamScore,
-          resultAwayTeam: game.result.awayTeamScore,
-          resultHomeTeamPenalties: game.result.homeTeamPenalties,
-          resultAwayTeamPenalties: game.result.awayTeamPenalties,
-          resultWinningTeam: game.result.winningTeam,
-        });
-      });
-      console.log("========= LIENA253 =====>", gameIds);
-      // busqueda de las predicciones de los usuarios que tienen resultados
-
-      const allGamePredictions = [];
-
-      for (let i = 0; i < gameIds.length; i++) {
-        console.log("=======PREDICTION 259====>", gameIds[i].gameId);
-        const prediction = await Predictions.find({
-          gameId: gameIds[i].gameId,
-        });
-
-        console.log("=======PREDICTION 264====>", prediction);
-        allGamePredictions.push(prediction);
-      }
-
-      //Prediccion de cada usuario por juego
-
-      if (allGamePredictions.length > 0) {
-        allGamePredictions.map(async (prediction) => {
-          const user = prediction[0].userId;
-          console.log("=====PREDICTION=====>", prediction);
-          const gameId = prediction[0].gameId;
-
-          const game = gamesUpdated.find(
-            (g) => g._id.toString() === gameId.toString()
-          );
-
-          const gameObject = await Games.findOne({ _id: gameId });
-          const tournamentId = gameObject.tournaments;
-          console.log("======== TOURNAMENT ====>", tournamentId);
-          //Busqueda del raking segun torneo y usuario ///
-          const rankingToFind = { tournamentId: tournamentId, userId: user };
-          console.log("======== rankingTOFIND ====>", rankingToFind);
-
-          const homeTeamScore = parseInt(
-            prediction[0].prediction.homeTeamScore
-          );
-          const awayTeamScore = parseInt(
-            prediction[0].prediction.awayTeamScore
-          );
-
-          let userTeamWinner = null;
-
-          if (
-            homeTeamScore > awayTeamScore &&
-            prediction[0].prediction.homeTeamScore !== "" &&
-            prediction[0].prediction.awayTeamScore !== ""
-          ) {
-            userTeamWinner = prediction[0].prediction.homeTeam.name;
-          } else if (
-            homeTeamScore < awayTeamScore &&
-            prediction[0].prediction.homeTeamScore !== "" &&
-            prediction[0].prediction.awayTeamScore !== ""
-          ) {
-            userTeamWinner = prediction[0].prediction.awayTeam.name;
-          } else if (
-            homeTeamScore == awayTeamScore &&
-            prediction[0].prediction.homeTeamScore !== "" &&
-            prediction[0].prediction.awayTeamScore !== ""
-          ) {
-            userTeamWinner = game.result.winningTeam;
-          } else {
-            userTeamWinner = "";
-          }
-
-          let points = 0;
-
-          if (game) {
-            points = calculatePointsToAdd(
-              userTeamWinner,
-              game.result.winningTeam,
-              homeTeamScore,
-              awayTeamScore,
-              parseInt(game.result.homeTeamScore),
-              parseInt(game.result.awayTeamScore)
-            );
-          }
-
-          console.log("=======PREDICTION 397====>", points);
-          const update = {
-            points: points,
-          };
-
-          const scoresToUpdate = [];
-          const filter = { gameId: gameId };
-          const usersToPushPoints = await Predictions.updateMany(
-            filter,
-            update
-          );
-          scoresToUpdate.push(usersToPushPoints);
-
-          const existingRanking = await Rankings.findOne(rankingToFind);
-          const score = { prediction: prediction[0]._id};
-          console.log("Rankings Existentes ============>", existingRanking);
-          console.log("score ============>", score);
-          
-
-          rankingPredictions = existingRanking.predictions;
-
-          const index = rankingPredictions.findIndex(
-            (predictions) => predictions._id === prediction[0]._id
-          );
-
-          if (index === -1) {
-            // La predicción no existe en la matriz, la agregamos
-            rankingPredictions.push(prediction[0]._id);
-          } else {
-            // La predicción ya existe en la matriz, actualizamos sus puntos
-            rankingPredictions[index] = prediction[0]._id;
-          }
-
-          console.log("NUEVAS PREDICCIONES DE RANKING", existingRanking );
-
-          const rankingtosend = [];
-          const updateRanking = await Rankings.updateMany(rankingToFind, existingRanking);
-          rankingtosend.push(updateRanking);
-        });
-      } else {
-        console.log("No hay predicciones para actualizar");
-      }
     } catch (err) {
       await createLog(uid, "PUT", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
+
+  //-----------------------------ADMIN RANKING--------------------------------
+  adminUpdateRanking: async (req, res) => {
+    const { id } = req.params;
+    const games = req.body.myData;
+    const uid = req.body.uid;
+    const user = await Users.findOne({ uid });
+    validationUser(user, res);
+
+    try {
+      let allGamesPredictions = [];
+
+      for (let i = 0; i < games.length; i++) {
+        const game = games[i];
+        const {
+          homeTeamScore,
+          awayTeamScore,
+          homeTeamPenalties,
+          awayTeamPenalties,
+          winningTeam,
+          winningType,
+        } = game.result;
+        let points = 0;
+
+        const gamePredictions = await Predictions.find({
+          gameId: game._id,
+        });
+
+        gamePredictions.map((prediction) => {
+          if (
+            parseInt(prediction.prediction.homeTeamScore) === "" ||
+            parseInt(prediction.prediction.awayTeamScore) === ""
+          ) {
+            points = 0;
+          } else if (
+            parseInt(prediction.prediction.homeTeamScore) ===
+              parseInt(homeTeamScore) &&
+            parseInt(prediction.prediction.awayTeamScore) ===
+              parseInt(awayTeamScore)
+          ) {
+            points = 5;
+          } else if (
+            parseInt(homeTeamScore) === parseInt(awayTeamScore) &&
+            ((parseInt(homeTeamPenalties) > parseInt(awayTeamPenalties) &&
+              parseInt(prediction.prediction.homeTeamScore) >
+                parseInt(prediction.prediction.awayTeamScore)) ||
+              (parseInt(homeTeamPenalties) < parseInt(awayTeamPenalties) &&
+                parseInt(prediction.prediction.homeTeamScore) <
+                  parseInt(prediction.prediction.awayTeamScore)))
+          ) {
+            points = 3;
+          } else if (
+            (parseInt(prediction.prediction.homeTeamScore) >
+              parseInt(prediction.prediction.awayTeamScore) &&
+              parseInt(homeTeamScore) > parseInt(awayTeamScore)) ||
+            (parseInt(prediction.prediction.homeTeamScore) <
+              parseInt(prediction.prediction.awayTeamScore) &&
+              parseInt(homeTeamScore) < parseInt(awayTeamScore))
+          ) {
+            points = 3;
+          } else {
+            points = 0;
+          }
+          prediction.points = points;
+        });
+
+        allGamesPredictions.push(gamePredictions);
+      }
+
+      const promises = allGamesPredictions.flatMap(gamePredictions =>
+        gamePredictions.map(prediction => {
+          return Predictions.findOneAndUpdate(
+            { _id: prediction._id },
+            { points: prediction.points }
+          );
+        })
+      );
+      
+      const rankingsPromises = allGamesPredictions.flatMap(gamePredictions =>
+        gamePredictions.map(prediction => {
+          console.log("PREDICTION", prediction);
+          return Rankings.findOneAndUpdate(
+            {
+              userId: prediction.userId,
+              tournamentId: id,
+              predictions: { $in: [prediction._id] } // busca si la prediccion._id se encuentra en el array de predictions
+            },
+            {
+              $set: { "predictions.$": prediction } // actualiza la prediccion correspondiente si se encuentra
+            },
+            { new: true } // devuelve el documento actualizado
+          ).then(rankings => {
+            if (!rankings) {
+              return Rankings.updateOne(
+                {
+                  userId: prediction.userId,
+                  tournamentId: id
+                },
+                {
+                  $push: { predictions: prediction } // agrega la prediccion si no se encuentra en la entrada de Ranking
+                },
+                { upsert: true } // crea una nueva entrada si no se encuentra ninguna
+              );
+            }
+            return rankings;
+          });
+        })
+      );
+      
+      const rankings = await Promise.all(rankingsPromises);
+      console.log("RANKINGS", rankings);
+
+      res.send("ranking actualizado")
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  //-----------------------------ADMIN RANKING--------------------------------
 
   adminEditAGame: async (req, res) => {
     const { uid } = req.body;
