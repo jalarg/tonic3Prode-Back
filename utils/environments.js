@@ -1,4 +1,3 @@
-
 module.exports = {
   validateRequiredEnvs: (requiredEnvs) => {
     for (const requiredEnv of requiredEnvs) {
@@ -29,6 +28,22 @@ module.exports = {
     if (user.rol !== "superAdmin") {
       return res.status(403).send("You are not allowed to do this action");
     }
+  },
+  validationAdmin: (user, res) => {
+    if (!user) return res.status(404).send("User not found");
+
+    if (user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }
+  },
+  validationAdminOrSuper: (user, res, next) => {
+    console.log("user back", user);
+    if (!user) return res.status(404).send("User not found");
+
+    if (user.rol == "superAdmin" || user.rol == "admin") {
+      next();
+    }
+    return res.status(403).send("You are not allowed to do this action");
   },
   gameDate: (schema) => {
     schema.virtual("date").get(function () {

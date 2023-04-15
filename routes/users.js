@@ -9,9 +9,11 @@ const {
   generateSecret2FA,
   verify2FA,
   updateToAdmin,
-  deleteUsers,
   deleteOneUser,
   userUpdate,
+  removeFromAdmins,
+  superAdminDeleteUsers,
+  adminDeleteUsers,
 } = require("../controllers/users");
 
 //-----------RUTAS GENERALES-------------//
@@ -41,11 +43,17 @@ router.put("/update/:uid", userUpdate);
 
 //-----------RUTAS PARA ADMINISTRADORES-------------//
 
-// EDIT ADMIN ROL
-router.put("/admin/role", updateToAdmin);
+// UPGRADE TO ADMIN
+router.put("/admin/updateToAdmin", updateToAdmin);
 
-// BORRAR TODOS LOS USUARIOS
-router.delete("/admin", deleteUsers);
+// REMOVE FROM ADMIN
+router.put("/admin/removeFromAdmins", removeFromAdmins);
+
+// SUPER ADMIN BORRA TODOS LOS USUARIOS
+router.delete("/superAdmin", superAdminDeleteUsers);
+
+//ADMIN BORRA A TODOS LOS USUARIOS CON ROL USER
+router.delete("/admins", adminDeleteUsers);
 
 // BORRAR A UN USUARIO
 router.delete("/admin/:uid", deleteOneUser);
