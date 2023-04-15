@@ -1,6 +1,10 @@
 const { Users } = require("../db_models");
 const { createLog } = require("../utils/createLog");
-const { validationSuperAdmin } = require("../utils/environments");
+const {
+  validationSuperAdmin,
+  validationAdminOrSuper,
+  validationAdmin,
+} = require("../utils/environments");
 const emailVerification = require("../utils/mailer");
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
@@ -231,19 +235,20 @@ module.exports = {
 
   // RUTAS DE PERMISO ESPECIAL!!
 
-  // SUPERADMIN PUEDE EDITAR ROL DE USUARIO
+  // SUPERADMIN y ADMIN PUEDE EDITAR ROL DE USUARIO
   updateToAdmin: async (req, res, next) => {
     const { uid, newAdminUid } = req.body;
+
     try {
       const user = await Users.findOne({ uid });
-      validationSuperAdmin(user, res);
+      // validationAdminOrSuper(user, res);
       const userToUpdate = await Users.findOneAndUpdate(
         { uid: newAdminUid },
         { rol: "admin" },
         { new: true }
       );
       if (!user) {
-        return res.status(404).send("User not found");
+        return res.status(401).json({ message: "user not found" });
       }
       // registro en caso de exito en log
       await createLog(
@@ -253,9 +258,38 @@ module.exports = {
         userToUpdate,
         "Se edita un usuario existente y se lo convierte en admin"
       );
-      res.send(userToUpdate);
+      res.status(200).json({ message: "Edited to admin correctly" });
     } catch (err) {
-      next(err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  //REMOVE FROM ADMINS
+  removeFromAdmins: async (req, res, next) => {
+    const { uid, newAdminUid } = req.body;
+
+    try {
+      const user = await Users.findOne({ uid });
+      // validationAdminOrSuper(user, res);
+      const userToRemove = await Users.findOneAndUpdate(
+        { uid: newAdminUid },
+        { rol: "user" },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(401).json({ message: "user not found" });
+      }
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "PUT",
+        req.originalUrl,
+        userToRemove,
+        "Se edita un usuario existente y se lo remueve de admins"
+      );
+      res.status(200).json({ message: "Edited to user correctly" });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 
@@ -275,12 +309,12 @@ module.exports = {
   },
 
   // SUPERADMIN PUEDE BORRAR TODOS LOS USUARIOS
-  deleteUsers: async (req, res, next) => {
+  superAdminDeleteUsers: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationSuperAdmin(user, res);
+    // validationSuperAdmin(user, res);
     try {
-      await Users.deleteMany();
+      await Users.deleteMany({ rol: { $in: ["admin", "user"] } });
       // registro en caso de exito en log
       await createLog(
         uid,
@@ -289,24 +323,53 @@ module.exports = {
         null,
         "Se borraron todos los usuarios de la base de datos"
       ); // registro en caso de exito
-      res.send("All the users were deleted");
+      res.status(200).json({ message: "All users deleted" });
     } catch (err) {
       await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
 
-  // SUPERADMIN PUEDE BORRAR UN USUARIO
+  //ADMIN BORRA USUARIOS CON ROL USER
+  adminDeleteUsers: async (req, res, next) => {
+    const { uid } = req.body;
+    const user = await Users.findOne({ uid });
+    // validationAdmin(user, res);
+
+    try {
+      const response = await Users.deleteMany({ rol: "user" });
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "DELETE",
+        req.originalUrl,
+        null,
+        "Se borraron todos los usuarios de la base de datos"
+      ); // registro en caso de exito
+      if (response.deletedCount) {
+        res.status(200).json({ message: "All users deleted" });
+      } else {
+        res
+          .status(200)
+          .json({ message: "You are not allowed to eliminate admins" });
+      }
+    } catch (err) {
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
+  },
+
+  // SUPERADMIN Y ADMIN PUEDEN BORRAR UN USUARIO
   deleteOneUser: async (req, res, next) => {
     const uidUserToDelete = req.params.uid;
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationSuperAdmin(user, res);
+    // validationAdminOrSuper(user, res);
     try {
       const user = await Users.findOneAndDelete({ uid: uidUserToDelete });
       // Check if user exists
       if (!user) {
-        return res.status(404).send("User not found");
+        return res.status(401).json({ message: "user not found" });
       }
       // registro en caso de exito en log
       await createLog(
@@ -316,7 +379,7 @@ module.exports = {
         user,
         "Se borra un usuario de la base de datos"
       );
-      res.send("The user was deleted");
+      res.status(200).json({ message: "Usuario editado correctamente" });
     } catch (err) {
       await createLog(req.params.uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
