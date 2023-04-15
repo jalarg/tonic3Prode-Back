@@ -16,6 +16,7 @@ const schema = Schema({
   scores: { type: Object, default: {} },
   isVerified: { type: Boolean, default: false },
   twoFactorSecret: { type: String, default: null },
+  PushSubscription: { type: Boolean, default: false },
 });
 
 // SET VIRTUAL FULL NAME
