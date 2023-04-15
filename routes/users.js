@@ -8,7 +8,7 @@ const {
   createOneUser,
   generateSecret2FA,
   verify2FA,
-  sendPushNotification,
+  sendPushNuevosPartidos,
   updateToAdmin,
   deleteOneUser,
   userUpdate,
@@ -40,7 +40,7 @@ router.post("/twofactor/:uid", generateSecret2FA);
 router.post("/2FA/verify", verify2FA);
 
 // NOTIFACIONES PUSH
-router.post("/push/:uid", sendPushNotification);
+router.post("/push/newgames/:uid", sendPushNuevosPartidos);
 
 //ACTUALIZAR DATOS USUARIO
 router.put("/update/:uid", userUpdate);

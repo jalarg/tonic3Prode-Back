@@ -1,4 +1,4 @@
-const { Users } = require("../db_models");
+const { Users, Tournaments } = require("../db_models");
 const { createLog } = require("../utils/createLog");
 const {
   validationSuperAdmin,
@@ -8,8 +8,27 @@ const {
 const emailVerification = require("../utils/mailer");
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
-const axios = require("axios");
+const webpush = require("web-push");
+const config = require("../config/index");
+const pushNotificationsPrivateAPIKey = config.pushNotificationsPrivateAPIKey;
+const pushNotificationsPublicAuthKey = config.pushNotificationsPublicAuthKey;
 
+//---- CONFIGURACION NOFITICACIONES PUSH ----//
+
+// Definir las opciones de VAPID
+const vapidKeys = {
+  publicKey: pushNotificationsPublicAuthKey,
+  privateKey: pushNotificationsPrivateAPIKey,
+};
+
+// Configurar las opciones de web-push
+webpush.setVapidDetails(
+  "mailto:gambet.bigbang@gmail.com",
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
+
+//-------------------------------------------//
 
 module.exports = {
   // RUTAS GENERALES DE PEDIDO GET
@@ -174,30 +193,38 @@ module.exports = {
     }
   },
   // RUTA PARA NOTIFICACIONES PUSH
-  sendPushNotification: async (req, res, next) => {
-    const { uid } = req.params;
-    const { deviceRegistrationToken, title, body } = req.body;
+  sendPushNuevosPartidos: async (req, res, next) => {
+    const { tournamentId, games } = req.body;
     try {
-      const apiKey =
-        "BLfG68c-Siz5l-fQ2t0PTtnu98KF7Hr7AhuWgiCmoK_LttoForDNSVvFsoXlajkUsc1kjdetbGW3a-9V0DVyesI";
-      const url = "https://fcm.googleapis.com/fcm/send";
-      const message = {
-        notification: {
-          title: title, 
-          body: body,
-        },
-        to: deviceRegistrationToken,
-      };
-      const response = await axios.post(url, message, {
-        headers: {
-          Authorization: "key=" + apiKey,
-          "Content-Type": "application/json",
-        },
+      // Crear el payload de la notificación push
+      const payload = JSON.stringify({
+        title: "Nuevos partidos cargados",
+        body: `Se han cargado ${games.length} nuevos partidos al torneo ${tournamentId}`,
       });
-      console.log("Mensaje enviado con éxito");
-      res.send(response.data);
+
+      // Obtener todos los usuarios inscriptos en el torneo
+      const tournament = await Tournaments.findById(tournamentId)
+        .select("users")
+        .populate("users", "pushSubscription");
+
+      // Filtrar los usuarios que tienen pushSubscription activada
+      const usersWithPushSubscription = tournament.users.filter(
+        (user) => user.pushSubscription
+      );
+
+      // Enviar la notificación push a cada suscripción activada
+      for (const user of usersWithPushSubscription) {
+        await webpush.sendNotification(user.pushSubscription, payload);
+      }
+
+      console.log(
+        `Mensaje de nuevos partidos enviado a ${usersWithPushSubscription.length} usuarios`
+      );
+      res.send({ success: true });
     } catch (error) {
-      await createLog(uid, "POST", req.originalUrl, error);
+      console.error(
+        `Error al enviar notificación de nuevos partidos: ${error}`
+      );
       next(error);
     }
   },
@@ -238,7 +265,6 @@ module.exports = {
   // SUPERADMIN y ADMIN PUEDE EDITAR ROL DE USUARIO
   updateToAdmin: async (req, res, next) => {
     const { uid, newAdminUid } = req.body;
-
     try {
       const user = await Users.findOne({ uid });
       // validationAdminOrSuper(user, res);
@@ -295,13 +321,13 @@ module.exports = {
 
   userUpdate: async (req, res, next) => {
     try {
-      const { username, cellphone, address } = req.body;
+      const { username, cellphone, address, PushSubscription } = req.body;
       const updatedUser = await Users.findOneAndUpdate(
-     
         { uid: req.params.uid },
-        { username, cellphone, address },
+        { username, cellphone, address, PushSubscription },
         { new: true }
       );
+      console.log(updatedUser);
       res.send(updatedUser);
     } catch (err) {
       next(err);
