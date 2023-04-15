@@ -8,6 +8,7 @@ const schema = Schema({
   uid: { type: String, unique: true },
   name: { type: String },
   lastName: { type: String },
+  gender: { type: String, required: true},
   rol: { type: String, default: "user" },
   address: { type: String },
   country: { type: String },
