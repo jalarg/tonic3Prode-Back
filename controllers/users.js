@@ -10,8 +10,8 @@ const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
 const webpush = require("web-push");
 const config = require("../config/index");
-const pushNotificationsPrivateAPIKey = config.pushNotificationsPrivateAPIKey;
-const pushNotificationsPublicAuthKey = config.pushNotificationsPublicAuthKey;
+// const pushNotificationsPrivateAPIKey = config.pushNotificationsPrivateAPIKey;
+// const pushNotificationsPublicAuthKey = config.pushNotificationsPublicAuthKey;
 
 //---- CONFIGURACION NOFITICACIONES PUSH ----//
 
