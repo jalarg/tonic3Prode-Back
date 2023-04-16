@@ -307,8 +307,6 @@ module.exports = {
             ).getDate()
           );
 
-
-          
           // Crea la nueva fecha sumando los valores aleatorios a la fecha actual
           const newDate = new Date(
             currentDate.getTime() +
@@ -373,6 +371,17 @@ module.exports = {
         });
 
         gamePredictions.map((prediction) => {
+          console.log(
+            "PREDICTION HOME TEAM SCORE",
+            parseInt(prediction.prediction.homeTeamScore)
+          );
+          console.log(
+            "PREDICTION AWAY TEAM SCORE",
+            parseInt(prediction.prediction.awayTeamScore)
+          );
+          console.log("RESULTADO HomeTeamScore", parseInt(homeTeamScore));
+          console.log("RESULTADO AwayTeamScore", parseInt(awayTeamScore));
+
           if (
             parseInt(prediction.prediction.homeTeamScore) === "" ||
             parseInt(prediction.prediction.awayTeamScore) === ""
@@ -415,6 +424,7 @@ module.exports = {
 
       const promises = allGamesPredictions.flatMap((gamePredictions) =>
         gamePredictions.map((prediction) => {
+          console.log("LINEA 396 ========>", prediction);
           return Predictions.findOneAndUpdate(
             { _id: prediction._id },
             { points: prediction.points }
@@ -422,19 +432,25 @@ module.exports = {
         })
       );
 
+      const updatedPredictions = await Promise.all(promises);
+
       const rankingsPromises = allGamesPredictions.flatMap((gamePredictions) =>
         gamePredictions.map((prediction) => {
-          console.log("PREDICTION", prediction);
+          // Busca la predicciÃ³n actualizada dentro de `updatedPredictions`
+          const updatedPrediction = updatedPredictions.find(
+            (p) => p._id.toString() === prediction._id.toString()
+          );
+
           return Rankings.findOneAndUpdate(
             {
               userId: prediction.userId,
               tournamentId: id,
-              predictions: { $in: [prediction._id] }, // busca si la prediccion._id se encuentra en el array de predictions
+              predictions: { $in: [prediction._id] },
             },
             {
-              $set: { "predictions.$": prediction }, // actualiza la prediccion correspondiente si se encuentra
+              $set: { "predictions.$": updatedPrediction },
             },
-            { new: true } // devuelve el documento actualizado
+            { new: true }
           ).then((rankings) => {
             if (!rankings) {
               return Rankings.updateOne(
@@ -443,9 +459,9 @@ module.exports = {
                   tournamentId: id,
                 },
                 {
-                  $push: { predictions: prediction }, // agrega la prediccion si no se encuentra en la entrada de Ranking
+                  $push: { predictions: updatedPrediction },
                 },
-                { upsert: true } // crea una nueva entrada si no se encuentra ninguna
+                { upsert: true }
               );
             }
             return rankings;
@@ -453,12 +469,12 @@ module.exports = {
         })
       );
 
-      const rankings = await Promise.all(rankingsPromises);
-      console.log("RANKINGS", rankings);
+      const updatedRankings = await Promise.all(rankingsPromises);
 
-      res.send("ranking actualizado");
+      res.send("Updated ranking predictions");
     } catch (err) {
-      console.log(err);
+      await createLog(uid, "PUT", req.originalUrl, err);
+      next(err);
     }
   },
   //-----------------------------ADMIN RANKING--------------------------------
