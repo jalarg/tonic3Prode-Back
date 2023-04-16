@@ -16,17 +16,17 @@ const pushNotificationsPublicAuthKey = config.pushNotificationsPublicAuthKey;
 //---- CONFIGURACION NOFITICACIONES PUSH ----//
 
 // Definir las opciones de VAPID
-const vapidKeys = {
-  publicKey: pushNotificationsPublicAuthKey,
-  privateKey: pushNotificationsPrivateAPIKey,
-};
+// const vapidKeys = {
+//   publicKey: pushNotificationsPublicAuthKey,
+//   privateKey: pushNotificationsPrivateAPIKey,
+// };
 
-// Configurar las opciones de web-push
-webpush.setVapidDetails(
-  "mailto:gambet.bigbang@gmail.com",
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
+// // Configurar las opciones de web-push
+// webpush.setVapidDetails(
+//   "mailto:gambet.bigbang@gmail.com",
+//   vapidKeys.publicKey,
+//   vapidKeys.privateKey
+// );
 
 //-------------------------------------------//
 
@@ -194,12 +194,32 @@ module.exports = {
   },
   // RUTA PARA NOTIFICACIONES PUSH
   sendPushNuevosPartidos: async (req, res, next) => {
-    const { tournamentId, games } = req.body;
+    const uid = req.params.uid;
+    const { tournamentId, games, language } = req.body;
     try {
+      // Definir los mensajes en cada idioma
+      const messages = {
+        en: {
+          title: "New games loaded",
+          body: `${games.length} new games have been loaded to tournament ${tournamentId}`,
+        },
+        es: {
+          title: "Nuevos partidos cargados",
+          body: `Se han cargado ${games.length} nuevos partidos al torneo ${tournamentId}`,
+        },
+        pt: {
+          title: "Novos jogos carregados",
+          body: `${games.length} novos jogos foram carregados para o torneio ${tournamentId}`,
+        },
+      };
+
+      // Obtener el mensaje en el idioma correspondiente
+      const message = messages[language] || messages["en"];
+
       // Crear el payload de la notificación push
       const payload = JSON.stringify({
-        title: "Nuevos partidos cargados",
-        body: `Se han cargado ${games.length} nuevos partidos al torneo ${tournamentId}`,
+        title: message.title,
+        body: message.body,
       });
 
       // Obtener todos los usuarios inscriptos en el torneo
@@ -213,18 +233,14 @@ module.exports = {
       );
 
       // Enviar la notificación push a cada suscripción activada
-      for (const user of usersWithPushSubscription) {
-        await webpush.sendNotification(user.pushSubscription, payload);
-      }
+      // for (const user of usersWithPushSubscription) {
+      //   await webpush.sendNotification(user.pushSubscription, payload);
+      // }
 
-      console.log(
-        `Mensaje de nuevos partidos enviado a ${usersWithPushSubscription.length} usuarios`
-      );
+      console.log(`Message sent to ${usersWithPushSubscription.length} users`);
       res.send({ success: true });
     } catch (error) {
-      console.error(
-        `Error al enviar notificación de nuevos partidos: ${error}`
-      );
+      console.error(`Error sending notification: ${error}`);
       next(error);
     }
   },
