@@ -27,3 +27,25 @@ Para la iniciacion del proyecto se requiere seguir los siguientes pasos:
 
 [Haz click para obtener el repositorio del Front-end](https://github.com/NeilenC/Tonic3Prode-Front/tree/main "Haz click para obtener el repositorio del Front-end")
 
+#####  Documentación:
+
+[Documentación back-end](https://docs.google.com/document/d/1Te8NMQOL4CBRzFNxGqUf6rmfGgq1-6RMboIku5EeGmI/edit# "Documentación back-end")
+
+[Documentación front-end](https://docs.google.com/document/d/1VyDVmTAo_BNUzHJVdwMN3cyrpyL2xVifQdAQ0xW84bk/edit "Documentación front-end")
+
+##### Schema Design
+
+[Link schema Design](https://drive.google.com/file/d/1JsMOzJhIeHblGupsrkAqEVfMs0j5GgE4/view?pli=1 "Link schema Design")
+
+
+###  Srum master 
+German Rivarola 
+
+### Desarrolladores 
+* Javier Lema
+* Rossana Contasti
+* Matias Dominguez
+* Francisco García
+* Leandro Bertelli
+* Neilen Monlezun
+
