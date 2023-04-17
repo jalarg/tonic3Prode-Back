@@ -3,7 +3,6 @@ const { teams } = require("../seed/teams");
 const { validationUser } = require("../utils/environments");
 const { createLog } = require("../utils/createLog");
 
-
 module.exports = {
   // RUTAS DE PEDIDOS PUBLICO GENERAL
   getAll: async (req, res, next) => {
@@ -50,23 +49,23 @@ module.exports = {
   createOneTeam: async (req, res, next) => {
     const { team, uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationUser(user, res) // Validacion de usuario
-     try {
-       const newTeam = new Teams(team);
-       const savedTeam = await newTeam.save();
-       // registro en caso de exito en log
-       await createLog(
-         uid,
-         "POST",
-         req.originalUrl,
-         savedTeam,
-         "Se creo un nuevo equipo en la base de datos"
-       );
-       res.send(savedTeam);
-     } catch (err) {
-       await createLog(uid, "POST", req.originalUrl, err); // registro en caso de error
-       next(err);
-     }
+    validationUser(user, res); // Validacion de usuario
+    try {
+      const newTeam = new Teams(team);
+      const savedTeam = await newTeam.save();
+      // registro en caso de exito en log
+      await createLog(
+        uid,
+        "POST",
+        req.originalUrl,
+        savedTeam,
+        "Se creo un nuevo equipo en la base de datos"
+      );
+      res.send(savedTeam);
+    } catch (err) {
+      await createLog(uid, "POST", req.originalUrl, err); // registro en caso de error
+      next(err);
+    }
   },
 
   updateOneTeam: async (req, res, next) => {
@@ -76,13 +75,13 @@ module.exports = {
     validationUser(user, res); // Validacion de usuario
 
     try {
-      const allowedUpdates = ["name", "logo_url", "foundation", "origin"];
-      const validUpdates = Object.keys(updates).every((update) =>
-        allowedUpdates.includes(update)
-      );
-      if (!validUpdates) {
-        return res.status(400).send("Invalid updates");
-      }
+      // const allowedUpdates = ["name", "logo_url", "foundation", "origin"];
+      // const validUpdates = Object.keys(updates).every((update) =>
+      //   allowedUpdates.includes(update)
+      // );
+      // if (!validUpdates) {
+      //   return res.status(400).send("Invalid updates");
+      // }
       const updatedTeam = await Teams.findByIdAndUpdate(teamId, updates, {
         new: true,
       });
@@ -107,7 +106,7 @@ module.exports = {
   deleteTeams: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationUser(user, res); // Validacion de usuario
+    // validationUser(user, res); // Validacion de usuario
     try {
       const teams = await Teams.deleteMany();
       // registro en caso de exito en log
@@ -128,7 +127,7 @@ module.exports = {
   deleteOneTeam: async (req, res, next) => {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
-    validationUser(user, res); // Validacion de usuario
+    // validationUser(user, res); // Validacion de usuario
     try {
       const team = await Teams.findOneAndDelete({ _id: req.params.id });
       // registro en caso de exito en log
@@ -141,7 +140,7 @@ module.exports = {
       );
       res.send("The team selected was deleted");
     } catch (err) {
-      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error  
+      await createLog(uid, "DELETE", req.originalUrl, err); // registro en caso de error
       next(err);
     }
   },
