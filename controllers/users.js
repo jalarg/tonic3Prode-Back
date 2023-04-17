@@ -312,7 +312,7 @@ module.exports = {
 
     try {
       const user = await Users.findOne({ uid });
-      // validationAdminOrSuper(user, res);
+      //validationSuperAdmin (user, res)
       const userToRemove = await Users.findOneAndUpdate(
         { uid: newAdminUid },
         { rol: "user" },
