@@ -43,7 +43,7 @@ German Rivarola
 
 ### Desarrolladores 
 * Javier Lema
-* Rossana Contasti
+* Rosanna Contasti
 * Matias Dominguez
 * Francisco García
 * Leandro Bertelli
