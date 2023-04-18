@@ -277,7 +277,9 @@ module.exports = {
           const team2 = winningTeams[i + 1][0];
 
           const newStage =
-            winningTeams.length === 16
+            winningTeams.length === 32
+              ? "16"
+              : winningTeams.length === 16
               ? "8"
               : winningTeams.length === 8
               ? "4"
@@ -286,6 +288,7 @@ module.exports = {
               : winningTeams.length === 2
               ? "1"
               : "";
+
           console.log(winningTeams.length, "longitud de winningTeams");
           console.log("Nueva fase:", newStage);
 
