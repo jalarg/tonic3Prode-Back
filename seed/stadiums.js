@@ -1,0 +1,211 @@
+const stadiums = [
+  {
+    name: "Estadio Monumental Antonio Vespucio Liberti",
+    team: "River Plate",
+    province: "Ciudad de Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Alberto J. Armando",
+    team: "Boca Juniors",
+    province: "Ciudad de Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Presidente Juan Domingo Perón",
+    team: "Racing Club",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Libertadores de América",
+    team: "Independiente",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Tomás Adolfo Ducó",
+    team: "Huracán",
+    province: "Ciudad de Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Brigadier General Estanislao López",
+    team: "Unión",
+    province: "Santa Fe",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Mario Alberto Kempes",
+    team: "Instituto",
+    province: "Córdoba",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Ciudad de La Plata",
+    team: "Estudiantes",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Único Madre de Ciudades",
+    team: "Santiago del Estero",
+    province: "Santiago del Estero",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio José Dellagiovanna",
+    team: "Tigre",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Bicentenario Ciudad de San Juan",
+    team: "San Martín de San Juan",
+    province: "San Juan",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Julio Humberto Grondona",
+    team: "Arsenal",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Presbítero Bartolomé Grella",
+    team: "Patronato",
+    province: "Entre Ríos",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Coloso del Parque",
+    team: "Newell's Old Boys",
+    province: "Santa Fe",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Malvinas Argentinas",
+    team: "Godoy Cruz",
+    province: "Mendoza",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Ciudad de Caseros",
+    team: "Club Atlético Estudiantes",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Eva Perón",
+    team: "Club Atlético Sarmiento",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Padre Martearena",
+    team: "Club Atlético Juventud Antoniana",
+    province: "Salta",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio José María Minella",
+    team: "Club Atlético Aldosivi",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Bicentenario Ciudad de Catamarca",
+    team: "Club Atlético San Lorenzo de Alem",
+    province: "Catamarca",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio José Dellagiovanna",
+    team: "Club Atlético Tigre",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Pedro Bidegain",
+    team: "Club Atlético San Lorenzo de Almagro",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Presbítero Bartolomé Grella",
+    team: "Club Atlético Patronato",
+    province: "Entre Ríos",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Centenario Dr. José Luis Meiszner",
+    team: "Club Atlético Brown",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Diego Armando Maradona",
+    team: "Argentinos Juniors",
+    province: "Ciudad de Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Nuevo Monumental",
+    team: "Deportivo Maipú",
+    province: "Mendoza",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Ciudad de Lanús - Néstor Díaz Pérez",
+    team: "Lanús",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Ciudad de Vicente López",
+    team: "Colegiales",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio 23 de Agosto",
+    team: "Gimnasia y Esgrima de Jujuy",
+    province: "Jujuy",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Eva Perón",
+    team: "Sarmiento",
+    province: "Buenos Aires",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Gigante de Arroyito",
+    team: "Rosario Central",
+    province: "Santa Fe",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Ciudad de Córdoba",
+    team: "Belgrano",
+    province: "Córdoba",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Mario Alberto Kempes",
+    team: "Talleres",
+    province: "Córdoba",
+    country: "Argentina",
+  },
+  {
+    name: "Estadio Presbítero Bartolomé Grella",
+    team: "Atlético Paraná",
+    province: "Entre Ríos",
+    country: "Argentina",
+  },
+];
+
+
+
+
+module.exports = stadiums;
