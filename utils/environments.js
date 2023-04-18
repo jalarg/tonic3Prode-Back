@@ -23,28 +23,30 @@ module.exports = {
     }
   },
   validationSuperAdmin: (user, res) => {
-    if (!user) return res.status(404).send("User not found");
+    if (!user) {
+      return res.status(404).send("User not found")}
 
     if (user.rol !== "superAdmin") {
       return res.status(403).send("You are not allowed to do this action");
     }
   },
   validationAdmin: (user, res) => {
-    if (!user) return res.status(404).send("User not found");
+    if (!user) {
+      return res.status(404).send("User not found")}
 
     if (user.rol !== "admin") {
       return res.status(403).send("You are not allowed to do this action");
     }
   },
   validationAdminOrSuper: (user, res, next) => {
-    console.log("user back", user);
-    if (!user) return res.status(404).send("User not found");
-
-    if (user.rol == "superAdmin" || user.rol == "admin") {
-      next();
+    if (!user) {
+      return res.status(404).send("User not found");
     }
-    return res.status(403).send("You are not allowed to do this action");
+    if (user.rol !== "superAdmin" && user.rol !== "admin") {
+      return res.status(403).send("You are not allowed to do this action");
+    }  
   },
+  
   gameDate: (schema) => {
     schema.virtual("date").get(function () {
       const date = new Date();

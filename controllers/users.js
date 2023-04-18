@@ -8,27 +8,7 @@ const {
 const emailVerification = require("../utils/mailer");
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
-const webpush = require("web-push");
-const config = require("../config/index");
-// const pushNotificationsPrivateAPIKey = config.pushNotificationsPrivateAPIKey;
-// const pushNotificationsPublicAuthKey = config.pushNotificationsPublicAuthKey;
 
-//---- CONFIGURACION NOFITICACIONES PUSH ----//
-
-// Definir las opciones de VAPID
-// const vapidKeys = {
-//   publicKey: pushNotificationsPublicAuthKey,
-//   privateKey: pushNotificationsPrivateAPIKey,
-// };
-
-// // Configurar las opciones de web-push
-// webpush.setVapidDetails(
-//   "mailto:gambet.bigbang@gmail.com",
-//   vapidKeys.publicKey,
-//   vapidKeys.privateKey
-// );
-
-//-------------------------------------------//
 
 module.exports = {
   // RUTAS GENERALES DE PEDIDO GET
@@ -92,7 +72,8 @@ module.exports = {
   getAllUsersFromOneTournament: async (req, res, next) => {
     try {
       const tournamentId = req.params.id;
-      const users = await Users.find({ tournaments: tournamentId });
+      const users = await Users.find({ tournaments: tournamentId })
+      console.log(users, "USERS")
       if (!users) {
         return res.status(404).send("Users not found");
       }
@@ -192,98 +173,14 @@ module.exports = {
       next(err);
     }
   },
-  // RUTA PARA NOTIFICACIONES PUSH
-  sendPushNuevosPartidos: async (req, res, next) => {
-    const uid = req.params.uid;
-    const { tournamentId, games, language } = req.body;
-    try {
-      // Definir los mensajes en cada idioma
-      const messages = {
-        en: {
-          title: "New games loaded",
-          body: `${games.length} new games have been loaded to tournament ${tournamentId}`,
-        },
-        es: {
-          title: "Nuevos partidos cargados",
-          body: `Se han cargado ${games.length} nuevos partidos al torneo ${tournamentId}`,
-        },
-        pt: {
-          title: "Novos jogos carregados",
-          body: `${games.length} novos jogos foram carregados para o torneio ${tournamentId}`,
-        },
-      };
-
-      // Obtener el mensaje en el idioma correspondiente
-      const message = messages[language] || messages["en"];
-
-      // Crear el payload de la notificación push
-      const payload = JSON.stringify({
-        title: message.title,
-        body: message.body,
-      });
-
-      // Obtener todos los usuarios inscriptos en el torneo
-      const tournament = await Tournaments.findById(tournamentId)
-        .select("users")
-        .populate("users", "pushSubscription");
-
-      // Filtrar los usuarios que tienen pushSubscription activada
-      const usersWithPushSubscription = tournament.users.filter(
-        (user) => user.pushSubscription
-      );
-
-      // Enviar la notificación push a cada suscripción activada
-      // for (const user of usersWithPushSubscription) {
-      //   await webpush.sendNotification(user.pushSubscription, payload);
-      // }
-
-      console.log(`Message sent to ${usersWithPushSubscription.length} users`);
-      res.send({ success: true });
-    } catch (error) {
-      console.error(`Error sending notification: ${error}`);
-      next(error);
-    }
-  },
-
-  // RUTA DE VERIFICACION DE EMAIL----------------------------- PENDIENTE DE REVISAR
-  verifyEmail: async (req, res, next) => {
-    const { token } = req.query;
-    try {
-      const user = await Users.findOneAndUpdate(
-        { uid: token },
-        { isVerified: true },
-        { new: true }
-      );
-
-      if (!user) {
-        throw new Error("Token no válido");
-      }
-
-      // Registro en caso de éxito en log
-      await createLog(
-        token,
-        "GET",
-        req.originalUrl,
-        user,
-        "Se actualiza el estado del usuario a verificado"
-      );
-
-      res.send("Tu correo ha sido verificado exitosamente.");
-    } catch (err) {
-      // Registro en caso de error en log
-      await createLog(token, "GET", req.originalUrl, err);
-      next(err);
-    }
-  },
 
   // RUTAS DE PERMISO ESPECIAL!!
-
   // SUPERADMIN y ADMIN PUEDE EDITAR ROL DE USUARIO
   updateToAdmin: async (req, res, next) => {
     const { uid, newAdminUid } = req.body;
     try {
       const user = await Users.findOne({ uid });
-      // validationAdminOrSuper(user, res);
+      validationAdminOrSuper(user, res);
       const userToUpdate = await Users.findOneAndUpdate(
         { uid: newAdminUid },
         { rol: "admin" },
@@ -312,7 +209,7 @@ module.exports = {
 
     try {
       const user = await Users.findOne({ uid });
-      //validationSuperAdmin (user, res)
+      validationSuperAdmin(user, res)
       const userToRemove = await Users.findOneAndUpdate(
         { uid: newAdminUid },
         { rol: "user" },
@@ -377,7 +274,6 @@ module.exports = {
     const { uid } = req.body;
     const user = await Users.findOne({ uid });
     // validationAdmin(user, res);
-
     try {
       const response = await Users.deleteMany({ rol: "user" });
       // registro en caso de exito en log
