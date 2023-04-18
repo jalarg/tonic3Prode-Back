@@ -73,7 +73,6 @@ module.exports = {
     try {
       const tournamentId = req.params.id;
       const users = await Users.find({ tournaments: tournamentId })
-      console.log(users, "USERS")
       if (!users) {
         return res.status(404).send("Users not found");
       }
@@ -89,7 +88,6 @@ module.exports = {
       const user = await Users.findOne({ uid: uid });
       if (user.twoFactorSecret) {
         // Si el usuario ya tiene un secreto 2FA registrado, devolvemos un mensaje indicando que no se puede generar un nuevo secreto 2FA
-        console.log("ENTRE EN LA CONDICION Y NO GENERO NUEVO 2FA");
         return res.send({
           message:
             "Ya tiene un secreto 2FA registrado. No se puede generar uno nuevo.",
@@ -240,7 +238,6 @@ module.exports = {
         { username, cellphone, address, PushSubscription },
         { new: true }
       );
-      console.log(updatedUser);
       res.send(updatedUser);
     } catch (err) {
       next(err);

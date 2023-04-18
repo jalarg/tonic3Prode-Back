@@ -34,13 +34,10 @@ module.exports = {
   },
   registerUserToTournament: async (req, res, next) => {
     const { TournamentId, uid } = req.params;
-    console.log(TournamentId, "ID DEL TORNEO");
-    console.log(uid, "UID DEL USUARIO");
     try {
       // Buscamos el usuario por id en la base de datos
       const user = await Users.findOne({ uid: uid });
       const country = user.country;
-      console.log(user, "USUARIO");
 
       // Buscamos el registro del ranking correspondiente
       const ranking = await Rankings.findOne({

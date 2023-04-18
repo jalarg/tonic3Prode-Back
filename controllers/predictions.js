@@ -284,7 +284,6 @@ module.exports = {
         const result = await Predictions.updateMany(updateFilter, update);
         predictionsScoreToUpdate.push(result);
         
-        console.log("    UPDATED POINTS     ");
       }
       res.send({
         totalPoints: totalPoints,

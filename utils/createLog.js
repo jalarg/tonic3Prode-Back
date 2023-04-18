@@ -10,7 +10,7 @@ async function createLog(uid, method, route, info, description) {
     data: null,
     description: description || null,
   };
-  console.log(logData);
+  console.log(logData);// [0] muestra el registro de actividad en la consola
 
   const filePath = path.join(__dirname, "logs.txt"); // [1] define la ruta y el nombre del archivo
   const logText = JSON.stringify(logData); // [2] convierte el objeto en texto

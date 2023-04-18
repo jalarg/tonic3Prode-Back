@@ -152,8 +152,6 @@ module.exports = {
     const { _id } = req.params;
     const userUid = req.body.userUid;
     const userId = req.body.userId;
-
-    console.log(req.body);
     try {
       // Verificar que los datos de entrada sean válidos
       if (!_id || !userId) {
@@ -170,7 +168,6 @@ module.exports = {
         return res.status(404).send({ message: "User not found" });
       }
       // check si el usuario ya se registro previamente
-      console.log(user._id, "ESTE ES EL USER POSTA")
       if (tournament.users.includes(user._id)) {
         return res
           .status(400)

@@ -371,16 +371,6 @@ module.exports = {
         });
 
         gamePredictions.map((prediction) => {
-          console.log(
-            "PREDICTION HOME TEAM SCORE",
-            parseInt(prediction.prediction.homeTeamScore)
-          );
-          console.log(
-            "PREDICTION AWAY TEAM SCORE",
-            parseInt(prediction.prediction.awayTeamScore)
-          );
-          console.log("RESULTADO HomeTeamScore", parseInt(homeTeamScore));
-          console.log("RESULTADO AwayTeamScore", parseInt(awayTeamScore));
 
           if (
             parseInt(prediction.prediction.homeTeamScore) === "" ||
@@ -424,7 +414,6 @@ module.exports = {
 
       const promises = allGamesPredictions.flatMap((gamePredictions) =>
         gamePredictions.map((prediction) => {
-          console.log("LINEA 396 ========>", prediction);
           return Predictions.findOneAndUpdate(
             { _id: prediction._id },
             { points: prediction.points }
