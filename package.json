@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "npm run server",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "build": "echo 'No build steps required.'"
   },
   "repository": {
     "type": "git",
